@@ -1,0 +1,156 @@
+{
+  "schema": "hardware-electronics/part",
+  "version": "1.0",
+  "id": "aqara-mccgq11lm",
+  "description": "Aqara MCCGQ11LM Zigbee door/window contact sensor (body + magnet)",
+  "vendor": "Aqara",
+  "mpn": "MCCGQ11LM",
+  "class": "sensor_module",
+  "footprint": {
+    "shape": "rect",
+    "l": 41.0,
+    "w": 22.0,
+    "h": 11.0,
+    "height_includes": "body_only",
+    "provenance": {
+      "l": "measured",
+      "w": "measured",
+      "h": "measured"
+    }
+  },
+  "electrical": {
+    "rail": "internal",
+    "battery": "CR1632",
+    "i_avg_ma": null,
+    "note": "Self-powered from its own coin cell. It contributes nothing to the host power budget, which is why a project built around it can legitimately skip the power-budget phase - as long as the skip is recorded, not silent."
+  },
+  "radio": {
+    "protocol": "zigbee",
+    "band_mhz": [
+      2400,
+      2500
+    ],
+    "antenna": "pcb_trace"
+  },
+  "orientation_constraint": {
+    "locked": true,
+    "kind": "sensing_axis",
+    "feature": "marker_line_on_41mm_face",
+    "axis": "+Z",
+    "reason": "The reed switch sits against one of the 41 mm LONG faces, and the manual says to align the marker lines on body and magnet. The sensor therefore has to stand ON ITS EDGE in a wall - 41 mm across, 11 mm into the wall, 22 mm tall - so the marked face points straight at the magnet. Laying it flat, which is the obvious thing to do, puts the magnet off-axis.",
+    "drives": [
+      "wall_thickness",
+      "boss_geometry",
+      "lid_magnet_pocket",
+      "interior_depth"
+    ],
+    "cost": "The boss eats about 13.8 mm of interior depth at the front."
+  },
+  "mate": {
+    "with": "magnet",
+    "gap_closed_mm": 2.0,
+    "gap_release_mm": 22.0,
+    "gap_source": "datasheet",
+    "dynamic": true,
+    "dynamic_note": "In a hinged-lid application the gap sweeps through the release distance at a specific lid angle. That is a KINEMATIC constraint evaluated through a motion, not a static clearance, and it has to be verified by sweeping the hinge - not by checking one position."
+  },
+  "keepouts": [
+    {
+      "id": "zigbee_antenna",
+      "kind": "rf",
+      "shape": "rect",
+      "l": 12.0,
+      "w": 22.0,
+      "h": 11.0,
+      "ref": "short_end",
+      "band_mhz": [
+        2400,
+        2500
+      ],
+      "material_rule": "no carbon-, glass- or metal-filled filament anywhere in the enclosure",
+      "reason": "PCB meander antenna at one short end. The magnet covers only the middle ~20 mm of the 41 mm body, so it stays clear of the antenna."
+    },
+    {
+      "id": "ventilation",
+      "kind": "thermal",
+      "shape": "rect",
+      "l": 30.0,
+      "w": 20.0,
+      "ref": "back_wall",
+      "requires": "vents",
+      "reason": "Aqara's manual explicitly warns against enclosing the sensor without ventilation."
+    }
+  ],
+  "serviceability": {
+    "battery": "CR1632",
+    "removable": true,
+    "requirement": "Must lift straight out. The cell is in a screwless snap shell with no documented way to open it, so a battery change is 'lift it out, swap, drop it back in'. A design that traps the sensor is a design that has to be destroyed to change a coin cell."
+  },
+  "access": [
+    {
+      "id": "reset_window",
+      "kind": "window",
+      "shape": "rect",
+      "l": 12.0,
+      "w": 8.0,
+      "face": "interior",
+      "reason": "The reset button is on the front face, not under the cover, so re-pairing and range-testing need no disassembly."
+    }
+  ],
+  "failure_mode": "silent",
+  "liveness_check": {
+    "required": true,
+    "how": "A last_seen automation on the home-automation side plus a battery-level alert. A dead Zigbee sensor fails silently: without that automation you would simply stop getting reminders and never find out why."
+  },
+  "traps": [
+    "Range-test it IN PLACE, inside the finished enclosure, in the room it will live in - not on the desk next to the coordinator.",
+    "Its failure mode is silence. Any part whose failure mode is silence requires a declared liveness check before the BOM gate will pass."
+  ],
+  "notes": [
+    "This part is the cleanest example of orientation-drives-geometry in either reference project: one orientation fact determines the wall thickness, the boss, the lid geometry, the magnet pocket and 13.8 mm of lost interior depth."
+  ],
+  "sources": [
+    "reference project B, README.md",
+    "Aqara MCCGQ11LM manual (marker-line alignment, ventilation warning)"
+  ],
+  "corroboration": {
+    "sources": [
+      {
+        "id": "manual",
+        "kind": "datasheet",
+        "ref": "Aqara MCCGQ11LM manual: marker-line alignment requirement, ventilation warning"
+      },
+      {
+        "id": "ref_project_b",
+        "kind": "measurement",
+        "ref": "reference project B project: body measured 41 x 22 x 11 mm with calipers; reed switch located against a 41 mm face"
+      }
+    ],
+    "groups": {
+      "footprint": {
+        "sources": [
+          "ref_project_b"
+        ],
+        "agreement": "full",
+        "note": "Measured, which outranks any document for a dimension."
+      },
+      "electrical": {
+        "sources": [
+          "manual"
+        ],
+        "agreement": "full",
+        "note": "Self-powered from its own CR1632; contributes nothing to a host power budget."
+      }
+    },
+    "conservative": false,
+    "contradictions": [],
+    "open_questions": [
+      {
+        "question": "The magnet release gap is kinematic in a hinged application and nothing in this pairing can evaluate a constraint through a motion.",
+        "impact": "The lid angle at which the state changes must be verified by sweeping the hinge, not by checking two static positions.",
+        "blocks_active": false
+      }
+    ]
+  },
+  "status": "active"
+}

@@ -1,0 +1,428 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hardware-electronics/component-manifest.schema.json",
+  "title": "Component manifest - the CAD contract (phase 8)",
+  "description": "The handoff artefact consumed by the parametric-3d-printing skill. Electronics owns what is true about the PART; CAD owns what is true about the PLASTIC. Hash-locked so a change on either side invalidates the other.",
+  "type": "object",
+  "required": ["schema", "version", "project", "units", "datum", "envelope", "components"],
+
+  "$defs": {
+    "provenance": {
+      "enum": ["assumed", "inferred", "seller_claimed", "vendor_claim", "simulated", "datasheet", "schematic", "measured"]
+    },
+    "provenanceField": {
+      "oneOf": [
+        { "$ref": "#/$defs/provenance" },
+        { "type": "object", "additionalProperties": { "$ref": "#/$defs/provenance" } },
+        { "type": "string", "pattern": "^measured:" }
+      ]
+    },
+    "shape": {
+      "type": "object",
+      "required": ["shape"],
+      "properties": {
+        "shape": { "enum": ["rect", "box", "circle", "cylinder", "polygon"] },
+        "l": { "type": "number", "exclusiveMinimum": 0 },
+        "w": { "type": "number", "exclusiveMinimum": 0 },
+        "h": { "type": "number", "exclusiveMinimum": 0 },
+        "d": { "type": "number", "exclusiveMinimum": 0 },
+        "points": {
+          "type": "array",
+          "items": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 }
+        }
+      }
+    },
+    "placement": {
+      "type": "object",
+      "properties": {
+        "owner": { "const": "cad" },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "z": { "type": "number" },
+        "rotation_z": { "type": "number" },
+        "face": { "type": "string" },
+        "seated": { "type": "string" }
+      }
+    }
+  },
+
+  "properties": {
+    "schema": { "const": "hardware-electronics/component-manifest" },
+    "version": { "type": "string" },
+    "project": { "type": "string" },
+    "generated": { "type": "string" },
+    "generator": { "type": "string" },
+    "content_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+
+    "units": {
+      "type": "object",
+      "required": ["length"],
+      "properties": {
+        "length": { "const": "mm" },
+        "angle": { "const": "deg" },
+        "current": { "const": "mA" },
+        "voltage": { "const": "V" },
+        "mass": { "const": "g" },
+        "temp": { "const": "C" }
+      }
+    },
+
+    "datum": {
+      "description": "Without a stated origin and axis convention, a sign error silently doubles into a clipped window. Say which way round the board goes and what flipping it would cost.",
+      "type": "object",
+      "required": ["origin", "axes"],
+      "properties": {
+        "origin": { "type": "string", "minLength": 5 },
+        "axes": { "type": "string", "minLength": 5 },
+        "note": { "type": "string" }
+      }
+    },
+
+    "envelope": {
+      "description": "Proposed by CAD. Electronics may VETO it if the parts do not fit, and that veto is how an enclosure legitimately grows.",
+      "type": "object",
+      "required": ["interior"],
+      "properties": {
+        "owner": { "const": "cad" },
+        "interior": {
+          "type": "object",
+          "required": ["l", "w", "h"],
+          "properties": {
+            "l": { "type": "number", "exclusiveMinimum": 0 },
+            "w": { "type": "number", "exclusiveMinimum": 0 },
+            "h": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        },
+        "exterior": {
+          "type": "object",
+          "properties": {
+            "l": { "type": "number" },
+            "w": { "type": "number" },
+            "h": { "type": "number" }
+          }
+        },
+        "split_plane_z": { "type": "number" },
+        "wall": { "type": "number", "exclusiveMinimum": 0 },
+        "material": { "type": "string" },
+        "material_filled": { "enum": ["none", "carbon_filled", "glass_filled", "metal_filled", "wood_filled"] },
+        "rf_transparent": { "type": "boolean" }
+      }
+    },
+
+    "components": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "class", "footprint"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+          "bom_ref": { "type": "string" },
+          "class": {
+            "enum": ["pcb", "module", "sensor_module", "transducer", "battery", "switch", "display", "connector", "antenna", "motor", "magnet", "other"]
+          },
+          "drives_cad": { "type": "boolean" },
+
+          "footprint": {
+            "allOf": [{ "$ref": "#/$defs/shape" }],
+            "properties": {
+              "tolerance": { "type": "number", "minimum": 0 },
+              "provenance": { "$ref": "#/$defs/provenanceField" },
+              "verify_before": { "enum": ["order", "print", "solder", "assembly", "none"] },
+              "fit_coupon_required": { "type": "boolean" },
+              "accepted_risk": {
+                "description": "The only legitimate way to print around a dimension that is still assumed. Requires a named human decision, not a shrug.",
+                "type": "object",
+                "required": ["who", "why"],
+                "properties": {
+                  "who": { "type": "string" },
+                  "why": { "type": "string" },
+                  "date": { "type": "string" }
+                }
+              }
+            }
+          },
+
+          "placement": { "$ref": "#/$defs/placement" },
+
+          "orientation_constraint": {
+            "description": "A functional axis. CAD may NOT rotate a component whose constraint is locked.",
+            "type": "object",
+            "required": ["locked", "kind", "axis", "reason"],
+            "properties": {
+              "locked": { "type": "boolean" },
+              "kind": {
+                "enum": ["feature_axis", "sensing_axis", "radiating_axis", "port_axis", "connector_axis", "thermal_axis", "polarity_axis"]
+              },
+              "feature": { "type": "string" },
+              "axis": { "enum": ["+X", "-X", "+Y", "-Y", "+Z", "-Z"] },
+              "reason": { "type": "string", "minLength": 10 },
+              "drives": { "type": "array", "items": { "type": "string" } },
+              "cost": { "type": "string" }
+            }
+          },
+
+          "mounting": {
+            "type": "object",
+            "properties": {
+              "method": { "type": "string" },
+              "why_not_screws": { "type": "string" },
+              "why_not_chamber": { "type": "string" },
+              "features": { "type": "array", "items": { "type": "object" } }
+            }
+          },
+
+          "keepouts": {
+            "type": "array",
+            "items": {
+              "allOf": [{ "$ref": "#/$defs/shape" }],
+              "required": ["id", "kind"],
+              "properties": {
+                "id": { "type": "string" },
+                "kind": { "enum": ["mechanical", "acoustic", "rf", "thermal", "magnetic", "access", "cable", "optical"] },
+                "ref": { "type": "string" },
+                "offset": {
+                  "description": "Keep-out centre relative to the component's placement. Real keep-outs are rarely concentric: an antenna channel runs along one edge, a connector zone sits at one end.",
+                  "type": "object",
+                  "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "z": { "type": "number" } }
+                },
+                "conditional_on": {
+                  "description": "A '<dotted.path> == <literal>' expression evaluated against this manifest, e.g. 'assembly.header_removed == false'. A condition nothing can resolve is reported, because a conditional keep-out that turns out to apply is a keep-out nobody checked.",
+                  "type": "string"
+                },
+                "min": { "type": "number" },
+                "max": { "type": "number" },
+                "band_mhz": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+                "material_rule": { "type": "string" },
+                "requires": { "type": "string" },
+                "reason": { "type": "string" }
+              }
+            }
+          },
+
+          "openings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "kind"],
+              "properties": {
+                "id": { "type": "string" },
+                "kind": { "enum": ["window", "channel", "perforation", "slot", "hole", "vent"] },
+                "shape": { "enum": ["rect", "circle", "polygon"] },
+                "l": { "type": "number" },
+                "w": { "type": "number" },
+                "depth": { "type": "number" },
+                "d": { "type": "number" },
+                "offset": {
+                  "type": "object",
+                  "properties": { "x": { "type": "number" }, "y": { "type": "number" } }
+                },
+                "tolerance": { "type": "number" },
+                "bezel_overlap": { "type": "number" },
+                "centreline_z": { "type": "number" },
+                "face": { "type": "string" },
+                "ref": { "type": "string" },
+                "pattern": { "type": "string" },
+                "min_open_area_mm2": { "type": "number" },
+                "target_ratio_of_cone": { "type": "number" },
+                "min_web": { "type": "number" },
+                "accepts_plug_boot": { "type": "object" },
+                "spec_max_plug_boot": { "type": "object" },
+                "must_not_breach": { "type": "array", "items": { "type": "string" } },
+                "provenance": { "$ref": "#/$defs/provenanceField" },
+                "reason": { "type": "string" },
+                "warning": { "type": "string" }
+              }
+            }
+          },
+
+          "rf": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "band_mhz"],
+              "properties": {
+                "id": { "type": "string" },
+                "band_mhz": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+                "connector": { "type": "string" },
+                "status": { "enum": ["confirmed", "UNVERIFIED"] },
+                "keepout": {
+                  "allOf": [{ "$ref": "#/$defs/shape" }],
+                  "properties": {
+                    "offset": {
+                      "type": "object",
+                      "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "z": { "type": "number" } }
+                    }
+                  }
+                },
+                "material_rule": { "type": "string" },
+                "clearance_from": { "type": "array", "items": { "type": "string" } },
+                "min_clearance_mm": { "type": "number" },
+                "note": { "type": "string" }
+              }
+            }
+          },
+
+          "thermal": {
+            "type": "object",
+            "properties": {
+              "dissipation_mw": { "type": "number" },
+              "max_ambient_c": { "type": "number" },
+              "needs_airflow": { "type": "boolean" }
+            }
+          },
+
+          "electrical": { "type": "object" },
+
+          "mate": {
+            "description": "A magnetic or mechanical pairing with another part. dynamic:true means the gap is swept through a motion, not held static.",
+            "type": "object",
+            "properties": {
+              "with": { "type": "string" },
+              "gap_closed_mm": { "type": "number" },
+              "gap_release_mm": { "type": "number" },
+              "gap_source": { "$ref": "#/$defs/provenance" },
+              "dynamic": { "type": "boolean" },
+              "dynamic_note": { "type": "string" }
+            }
+          },
+
+          "serviceability": {
+            "type": "object",
+            "properties": {
+              "battery": { "type": "string" },
+              "removable": { "type": "boolean" },
+              "requirement": { "type": "string" }
+            }
+          },
+
+          "access": { "type": "array", "items": { "type": "object" } },
+
+          "failure_mode": { "enum": ["loud", "silent", "degraded", "unknown"] },
+          "liveness_check": {
+            "type": "object",
+            "properties": {
+              "required": { "type": "boolean" },
+              "how": { "type": "string" }
+            }
+          },
+
+          "cad_parameters": {
+            "description": "Maps a CAD script parameter name to the manifest path that owns its value. This is what turns a substitution into a named reprint instead of a surprise.",
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          },
+
+          "substitution_trap": { "type": "string" }
+        }
+      }
+    },
+
+    "cable_runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "from", "to"],
+        "properties": {
+          "id": { "type": "string" },
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "connector": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" },
+              "pitch_mm": { "type": "number" },
+              "pins": { "type": "integer" },
+              "polarity_verified": { "type": "boolean" },
+              "warning": { "type": "string" }
+            }
+          },
+          "conductors": { "type": "integer", "minimum": 1 },
+          "awg": { "type": "integer" },
+          "bundle_d_mm": { "type": "number" },
+          "min_bend_r_mm": { "type": "number" },
+          "slack_mm": { "type": "number" },
+          "channel_min": {
+            "description": "Electronics states the MINIMUM cross-section; CAD implements at least that and reports the realised value back.",
+            "type": "object",
+            "required": ["w", "h"],
+            "properties": { "w": { "type": "number" }, "h": { "type": "number" } }
+          },
+          "path_hint": { "type": "array", "items": { "type": "string" } },
+          "must_avoid": { "type": "array", "items": { "type": "string" } },
+          "note": { "type": "string" }
+        }
+      }
+    },
+
+    "assertions": {
+      "description": "Checks the CAD side must satisfy and report back in cad-response.json. A blocking assertion outside its band fails the handoff.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "check"],
+        "properties": {
+          "id": { "type": "string" },
+          "subject": { "type": "string" },
+          "check": {
+            "enum": ["clearance", "distance", "no_intersect", "no_intersect_in_plan", "sum_in_band", "min_wall", "material_not_in", "open_area"]
+          },
+          "target": { "type": ["string", "array"] },
+          "terms": { "type": "array", "items": { "type": "string" } },
+          "values": { "type": "array" },
+          "min_mm": { "type": "number" },
+          "max_mm": { "type": "number" },
+          "owner": { "enum": ["cad", "electronics", "shared"] },
+          "blocking": { "type": "boolean", "default": true },
+          "why": { "type": "string" }
+        }
+      }
+    },
+
+    "accepted_findings": {
+      "description": "Advisory findings this handoff accepts on purpose, each with a written reason. Excluded from the content hash, so accepting one never forces a reprint. Findings that cost a reprint - overlaps, containment, assumed dimensions, stale hashes, open counter-constraints - cannot be accepted here.",
+      "type": "object",
+      "additionalProperties": { "type": "string", "minLength": 10 }
+    },
+
+    "assembly": {
+      "description": "Assembly decisions that other fields condition on, such as whether a header was removed. A conditional keep-out is only checkable if the thing it depends on is written down.",
+      "type": "object",
+      "additionalProperties": { "type": ["boolean", "string", "number"] }
+    },
+
+    "assembly_order": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["step", "what"],
+        "properties": {
+          "step": { "type": "integer", "minimum": 1 },
+          "what": { "type": "string" },
+          "why_this_order": { "type": "string" },
+          "irreversible": { "type": "boolean" }
+        }
+      }
+    },
+
+    "open_gates": {
+      "description": "Numbers still below 'measured' that the build depends on. measure_log.py --audit fails while any of these is marked verify_before_build and unmeasured.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["key", "provenance", "how_to_close"],
+        "properties": {
+          "key": { "type": "string" },
+          "assumed": { "type": ["number", "string"] },
+          "unit": { "type": "string" },
+          "provenance": { "$ref": "#/$defs/provenance" },
+          "conflict": { "type": "string" },
+          "impact": { "type": "string" },
+          "sensitivity": { "type": "string" },
+          "verify_before_build": { "type": "boolean", "default": true },
+          "how_to_close": { "type": "string", "minLength": 10 }
+        }
+      }
+    }
+  }
+}

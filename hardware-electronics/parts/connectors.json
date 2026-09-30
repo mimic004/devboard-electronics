@@ -1,0 +1,87 @@
+{
+  "schema": "hardware-electronics/connectors",
+  "version": "1.0",
+  "description": "Pitch and mating table. PITCH IS THE FACT; the family name is marketing. Vendors label 1.25 mm parts 'SH1.25' although JST's own SH series is 1.0 mm, so bom_lint treats a pitch mismatch as an error and a family-name mismatch at equal pitch as a warning.",
+
+  "mating_rule": "Two connectors mate only if pitch and pin count both match and the genders are complementary. Nothing else is sufficient. Polarity is a separate question and is never standardised - meter it.",
+
+  "families": {
+    "JST-PH": {
+      "pitch_mm": 2.0,
+      "aka": ["PH", "PH2.0", "PH 2.0 mm"],
+      "common_pins": [2, 3, 4, 5, 6],
+      "typical_use": "LiPo cell leads on Adafruit/SparkFun boards, generic hobby battery leads",
+      "note": "The single most common connector mistake in hobby builds: a PH 2.0 cell lead will not enter a 1.25 mm socket."
+    },
+    "JST-SH": {
+      "pitch_mm": 1.0,
+      "aka": ["SH", "SH1.0", "Qwiic", "STEMMA QT"],
+      "common_pins": [2, 3, 4, 5, 6],
+      "typical_use": "Qwiic/STEMMA QT I2C, small sensor links such as the Heltec QuickLink (SH1.0-4P)"
+    },
+    "SH1.25": {
+      "pitch_mm": 1.25,
+      "aka": ["SH 1.25", "GH-compatible 1.25", "MX1.25"],
+      "common_pins": [2, 3, 4],
+      "typical_use": "Small LiPo cells and many ESP32 dev-board battery inputs, including the Heltec E290 JP1 (SH1.25-2P)",
+      "note": "Labelled 'SH' by most sellers even though JST's SH series is 1.0 mm. Treat the 1.25 mm pitch as the fact."
+    },
+    "JST-GH": {
+      "pitch_mm": 1.25,
+      "aka": ["GH", "GH1.25"],
+      "common_pins": [2, 3, 4, 5, 6],
+      "typical_use": "Locking 1.25 mm connector, common on flight controllers",
+      "note": "Same pitch as SH1.25 but has a latch. Mechanically will often mate; do not rely on it."
+    },
+    "JST-ZH": {
+      "pitch_mm": 1.5,
+      "aka": ["ZH", "ZH1.5"],
+      "common_pins": [2, 3, 4, 5, 6],
+      "typical_use": "Small signal links"
+    },
+    "JST-XH": {
+      "pitch_mm": 2.5,
+      "aka": ["XH", "XH2.54", "XH 2.5 mm"],
+      "common_pins": [2, 3, 4, 5, 6, 7],
+      "typical_use": "Balance leads on multi-cell packs, general-purpose wiring"
+    },
+    "DuPont": {
+      "pitch_mm": 2.54,
+      "aka": ["0.1 inch header", "2.54 header", "jumper wire"],
+      "common_pins": [1, 2, 3, 4, 5, 6, 7, 8],
+      "typical_use": "Breadboarding and dev-board headers",
+      "note": "Not a retention system. Fine on the bench, unreliable in anything that moves."
+    },
+    "solder_pad": {
+      "pitch_mm": null,
+      "typical_use": "Speakers, motors, piezo discs, cells with bare leads",
+      "note": "Mates with nothing; it is a permanent joint. Plan the assembly order around it, because it is irreversible without rework."
+    },
+    "U.FL": {
+      "pitch_mm": null,
+      "aka": ["IPEX", "IPX", "MHF1"],
+      "typical_use": "RF antenna pigtails",
+      "note": "Rated for a small number of mating cycles and easy to damage. Fit the pigtail once and leave it."
+    }
+  },
+
+  "cross_plug_guidance": "Deliberately choosing DIFFERENT pitches for different nets is a design virtue: it makes cross-plugging physically impossible. The Heltec E290 does this - the battery is 1.25 mm and the QuickLink sensor bus is 1.0 mm, so the two cannot be swapped. bom_lint credits this and flags its absence when two different nets share one connector type.",
+
+  "awg_current": {
+    "note": "Chassis-wiring style guidance for short hobby runs in still air. Derate for bundles, long runs and high ambient temperature.",
+    "table": [
+      { "awg": 30, "max_a": 0.86, "typical_use": "signal, speaker pigtails" },
+      { "awg": 28, "max_a": 1.4, "typical_use": "small cell leads, I2C" },
+      { "awg": 26, "max_a": 2.2, "typical_use": "general signal and light power" },
+      { "awg": 24, "max_a": 3.5, "typical_use": "power to small modules" },
+      { "awg": 22, "max_a": 7.0, "typical_use": "motor and amplifier power" },
+      { "awg": 20, "max_a": 11.0, "typical_use": "main power runs" }
+    ]
+  },
+
+  "sources": [
+    "reference project A, docs/bom.md (PH-vs-SH1.25 trap, deliberate pitch separation)",
+    "reference project A, docs/e290-hardware-reference.md (JP1 = SH1.25-2P, QuickLink = SH1.0-4P)",
+    "JST series data and general wiring practice"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "schema": "hardware-electronics/serial-transcript",
+  "version": "1.0",
+  "port": "COM7",
+  "recorded": "2026-09-24T19:12:00-06:00",
+  "note": "A healthy I2C scan on the pager: expander at 0x20, haptic driver at 0x5a, nothing else.",
+  "banner": ["probe.ready 1.0", "probe.hint send HELP for the command list"],
+  "exchanges": [
+    {
+      "tx": "PROBE i2c 39 38 100000",
+      "rx": [
+        "probe.i2c.begin ok",
+        "probe.i2c.sda 39",
+        "probe.i2c.scl 38",
+        "probe.i2c.hz 100000",
+        "probe.i2c.found 0x20",
+        "probe.i2c.found 0x5a",
+        "probe.i2c.count 2",
+        "probe.i2c.elapsed_ms 41",
+        "probe.done i2c ok"
+      ]
+    }
+  ]
+}

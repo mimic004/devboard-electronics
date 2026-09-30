@@ -1,0 +1,82 @@
+{
+  "schema": "hardware-electronics/component-manifest",
+  "version": "1.0",
+  "project": "fixture-bad-handoff",
+  "units": { "length": "mm" },
+  "datum": {
+    "origin": "interior_centre",
+    "axes": "+X long axis, +Y across, +Z up"
+  },
+  "envelope": {
+    "owner": "cad",
+    "interior": { "l": 80.0, "w": 60.0, "h": 15.0 },
+    "material": "carbon-filled PETG",
+    "material_filled": "carbon_filled"
+  },
+  "components": [
+    {
+      "id": "board",
+      "class": "pcb",
+      "drives_cad": true,
+      "footprint": {
+        "shape": "rect",
+        "l": 50.0,
+        "w": 30.0,
+        "h": 6.0,
+        "provenance": { "l": "measured", "w": "measured", "h": "measured" },
+        "verify_before": "none"
+      },
+      "placement": { "owner": "cad", "x": 0.0, "y": 0.0, "z": 0.0, "rotation_z": 0.0 },
+      "rf": [
+        {
+          "id": "antenna",
+          "band_mhz": [2400, 2500],
+          "connector": "ufl",
+          "status": "confirmed",
+          "keepout": { "shape": "rect", "l": 40.0, "w": 10.0, "h": 6.0, "offset": { "x": 0.0, "y": 0.0 } },
+          "clearance_from": ["cell"],
+          "min_clearance_mm": 5.0
+        }
+      ],
+      "cad_parameters": { "board_l": "footprint.l" }
+    },
+    {
+      "id": "cell",
+      "class": "battery",
+      "drives_cad": true,
+      "footprint": {
+        "shape": "rect",
+        "l": 40.0,
+        "w": 25.0,
+        "h": 6.0,
+        "provenance": { "l": "seller_claimed", "w": "seller_claimed", "h": "seller_claimed" },
+        "verify_before": "print"
+      },
+      "placement": { "owner": "cad", "x": 10.0, "y": 5.0, "z": 0.0, "rotation_z": 0.0 },
+      "cad_parameters": { "cell_l": "footprint.l" }
+    },
+    {
+      "id": "buzzer",
+      "class": "transducer",
+      "drives_cad": true,
+      "footprint": {
+        "shape": "circle",
+        "d": 20.0,
+        "h": 4.0,
+        "provenance": { "d": "measured", "h": "measured" },
+        "verify_before": "none"
+      },
+      "placement": { "owner": "cad", "x": 36.0, "y": -22.0, "z": 0.0, "rotation_z": 0.0 }
+    }
+  ],
+  "cable_runs": [
+    {
+      "id": "cell_to_board",
+      "from": "cell.lead",
+      "to": "board.J1",
+      "conductors": 2,
+      "awg": 28,
+      "bundle_d_mm": 2.4
+    }
+  ]
+}

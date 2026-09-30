@@ -1,0 +1,101 @@
+{
+  "schema": "hardware-electronics/part",
+  "version": "1.0",
+  "id": "max98357a-adafruit3006",
+  "description": "MAX98357A I2S class-D mono amplifier breakout",
+  "vendor": "Adafruit",
+  "sku": "3006",
+  "mpn": "MAX98357A",
+  "class": "amplifier",
+  "footprint": {
+    "shape": "rect",
+    "l": 20.7,
+    "w": 17.0,
+    "h": 3.0,
+    "height_includes": "body_only",
+    "provenance": {
+      "l": "vendor_claim",
+      "w": "vendor_claim",
+      "h": "assumed"
+    }
+  },
+  "logic_v": 3.3,
+  "level_tolerant_5v": true,
+  "electrical": {
+    "rail": "VBAT",
+    "v_min": 2.5,
+    "v_max": 5.5,
+    "i_avg_ma": 2.4,
+    "i_peak_ma": 1000,
+    "provenance": "datasheet",
+    "bulk_uf_recommended": 100,
+    "shutdown_pin": "SD - tie low to mute, and gate the rail entirely if you care about sleep current"
+  },
+  "bus": {
+    "kind": "i2s",
+    "signals": [
+      "BCLK",
+      "LRC",
+      "DIN"
+    ],
+    "pins_consumed": 3
+  },
+  "keepouts": [
+    {
+      "id": "speaker_terminal",
+      "kind": "access",
+      "shape": "rect",
+      "l": 20.7,
+      "w": 5.0,
+      "h": 6.0,
+      "reason": "Screw-terminal speaker output on one edge."
+    }
+  ],
+  "failure_mode": "loud",
+  "traps": [
+    "DO NOT power this from a small 3V3 LDO. It can pull about 1 A peak into a 4 ohm load. On the Heltec E290 the 3V3 rail is a CE6260B33M rated 600 mA, so feeding the amp from it overdraws the rail by a wide margin. Run it from VBAT with its own local bulk capacitance, and gate that rail with a load switch.",
+    "The peak-minus-average current here is ~1000 mA. Any load with a transient above about 100 mA needs declared bulk capacitance sited AT THE PART, not at the connector."
+  ],
+  "notes": [
+    "Class-D amplifiers are efficient on average and brutal on transients. The average figure is what fools people; the peak is what browns out the MCU.",
+    "Bring it up ALONE. An I2S microphone and an I2S amplifier brought up together, producing silence, tells you nothing about which one is wrong."
+  ],
+  "sources": [
+    "Maxim MAX98357A datasheet",
+    "reference project A, docs/e290-hardware-reference.md (do not power the MAX98357A from the board's 3V3 LDO)"
+  ],
+  "corroboration": {
+    "sources": [
+      {
+        "id": "maxim",
+        "kind": "datasheet",
+        "ref": "Maxim MAX98357A datasheet: supply range, peak output current into a low-impedance load"
+      },
+      {
+        "id": "ref_project_a",
+        "kind": "community_firmware",
+        "ref": "reference project A docs/e290-hardware-reference.md: do not power this from the board's 600 mA 3V3 LDO"
+      }
+    ],
+    "groups": {
+      "electrical": {
+        "sources": [
+          "maxim",
+          "ref_project_a"
+        ],
+        "agreement": "full"
+      },
+      "footprint": {
+        "sources": [
+          "maxim"
+        ],
+        "agreement": "full",
+        "note": "Breakout outline is vendor_claim in the profile; height is tagged assumed."
+      }
+    },
+    "conservative": false,
+    "contradictions": [],
+    "open_questions": []
+  },
+  "status": "active"
+}

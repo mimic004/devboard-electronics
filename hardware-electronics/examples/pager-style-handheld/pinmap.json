@@ -1,0 +1,56 @@
+{
+  "schema": "hardware-electronics/pinmap",
+  "version": "1.0",
+  "project": "pager-style-handheld",
+  "board": "heltec_vision_master_e290",
+
+  "radio": { "wifi": true, "ble": false, "lora": true },
+  "console": "usb_cdc",
+  "deep_sleep": true,
+
+  "nets": [
+    { "net": "i2s_mic.BCLK", "pin": 41, "mode": "output", "note": "JTAG MTDI. See accepted_findings." },
+    { "net": "i2s_mic.WS", "pin": 42, "mode": "output", "note": "JTAG MTMS." },
+    { "net": "i2s_mic.SD", "pin": 40, "mode": "input", "note": "JTAG MTDO." },
+    { "net": "amp.BCLK", "pin": 47, "mode": "output" },
+    { "net": "amp.LRC", "pin": 48, "mode": "output" },
+    { "net": "amp.DIN", "pin": 17, "mode": "output", "note": "The board's only remaining free pin. It is ADC2_CH6, which is useless as an analog input with Wi-Fi on, but perfectly good as a digital output." },
+    {
+      "net": "expander.INT",
+      "pin": 21,
+      "mode": "input_pullup",
+      "shared": true,
+      "note": "Diode-OR'd with the USER button. GPIO21 is the only RTC-capable pin left on this board, and a deep-sleep wake source has to be RTC-capable."
+    }
+  ],
+
+  "buses": [
+    {
+      "kind": "i2c",
+      "id": "i2c0",
+      "sda": 39,
+      "scl": 38,
+      "hz": 100000,
+      "logic_v": 3.3,
+      "pullup_source": "10k on each module; no discrete resistors fitted",
+      "devices": [
+        { "ref": "expander", "addr": "0x20", "part_ref": "mcp23017-waveshare" },
+        { "ref": "haptic", "addr": "0x5A", "part_ref": "drv2605l-adafruit2305" }
+      ]
+    }
+  ],
+
+  "wake_sources": [
+    { "net": "expander.INT", "pin": 21, "kind": "ext0" }
+  ],
+
+  "required_pins": {
+    "digital": 0,
+    "analog": 0,
+    "reason": "The six audio pins map onto the six free pins exactly, with nothing to spare. Any further peripheral has to go behind the expander or replace something."
+  },
+
+  "accepted_findings": {
+    "JTAG_COST": "GPIO40/41/42 carry the I2S microphone because there is nowhere else for them to go: the board has exactly six free pins and audio needs six. The cost is hardware JTAG debugging, which this project has never used - USB-Serial-JTAG on GPIO19/20 is unaffected and covers flashing and the console. Accepted knowingly, not overlooked."
+  }
+}

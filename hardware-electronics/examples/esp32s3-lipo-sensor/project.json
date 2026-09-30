@@ -1,0 +1,48 @@
+{
+  "schema": "hardware-electronics/project",
+  "version": "1.0",
+  "project": "esp32s3-lipo-sensor",
+  "created": "2026-09-27",
+  "summary": "Battery-powered ESP32-S3 environmental sensor. Wakes every ~15 minutes, reads a BME280 over I2C, publishes over Wi-Fi, returns to deep sleep. No enclosure: it lives in an off-the-shelf box.",
+
+  "voltage_class": {
+    "max_v": 5.0,
+    "kind": "dc",
+    "mains_involved": false,
+    "source": "USB VBUS is the highest voltage present; the cell is a single LiPo."
+  },
+
+  "application": {
+    "description": "Environmental monitoring for a greenhouse. Nothing depends on it.",
+    "safety_critical": false,
+    "safety_category": "none"
+  },
+
+  "tools": {
+    "multimeter": true,
+    "multimeter_ua_range": true,
+    "calipers": true,
+    "soldering_iron": true,
+    "logic_analyzer": false,
+    "oscilloscope": false,
+    "bench_psu_current_limited": false,
+    "usb_serial_adapter": true,
+    "3d_printer": false
+  },
+
+  "enclosure": {
+    "required": false,
+    "printed": false
+  },
+
+  "skipped": [
+    {
+      "phase": 5,
+      "reason": "Four wires between two boards on a JST lead and an I2C pigtail. A netlist and a rendered wiring diagram would carry less information than the pin map already does, and this build has no hand-wired harness to get wrong."
+    },
+    {
+      "phase": 8,
+      "reason": "No enclosure is being designed or printed, so there is no CAD handoff and no component manifest. The parts live in a bought box with a lid that already fits."
+    }
+  ]
+}

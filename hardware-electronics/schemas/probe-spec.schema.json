@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hardware-electronics/probe-spec.schema.json",
+  "title": "Peripheral probe specification (phase 7)",
+  "description": "Declares the expected result AND the plausibility band. A result that is implausibly good is a FAIL, not a pass: an e-paper refresh that 'succeeded' in 29 ms had an unpowered controller and a floating BUSY line. Consumed by probe_client.py, which is not part of the M0-M5 core build; the schema ships now so phase 7 data has a shape.",
+  "type": "object",
+  "required": ["peripheral", "command", "expect"],
+  "properties": {
+    "peripheral": { "type": "string" },
+    "board": { "type": "string" },
+    "command": { "type": "string" },
+
+    "preconditions": {
+      "description": "State that must be established and settled BEFORE the sequence. Most implausible successes are a missing precondition, not a flake.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "gpio": { "type": ["string", "integer"] },
+          "level": { "enum": ["high", "low"] },
+          "settle_ms": { "type": "number", "minimum": 0 },
+          "note": { "type": "string" }
+        }
+      }
+    },
+
+    "expect": {
+      "type": "object",
+      "properties": {
+        "result": { "enum": ["ok", "fail"] },
+        "i2c_addresses": {
+          "description": "The EXACT expected address set, not a superset. Finding an extra device is as interesting as missing one.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^0[xX][0-9a-fA-F]{1,2}$" }
+        },
+        "values": { "type": "object" }
+      }
+    },
+
+    "plausibility": {
+      "description": "Bounds on every measurement. Never widen a band to make a test pass - that is the electronics equivalent of wrapping a fillet in try/except.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["why"],
+        "properties": {
+          "min": { "type": "number" },
+          "max": { "type": "number" },
+          "why": { "type": "string", "minLength": 10 }
+        }
+      }
+    },
+
+    "requires_transition": {
+      "description": "A steady-state observation never proves a subsystem is alive. Demand a counter that increments or a level that moves.",
+      "type": "object",
+      "properties": {
+        "measurement": { "type": "string" },
+        "must_change": { "type": "boolean", "default": true },
+        "why": { "type": "string" }
+      }
+    },
+
+    "timeout_s": { "type": "number", "exclusiveMinimum": 0, "default": 30 },
+    "retry_allowed": {
+      "description": "Default false. A retry that sometimes works is a wiring fault, not a flake.",
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

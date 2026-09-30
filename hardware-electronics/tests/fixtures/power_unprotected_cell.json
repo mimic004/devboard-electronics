@@ -1,0 +1,30 @@
+{
+  "schema": "hardware-electronics/power",
+  "version": "1.0",
+  "project": "fixture-unprotected-cell",
+
+  "battery": {
+    "chemistry": "lipo",
+    "capacity_mah": 2000,
+    "protection": false,
+    "external_protection_ic": null,
+    "usable_fraction": 0.85
+  },
+
+  "charge": {
+    "ic": "TP4056",
+    "ma": 1000,
+    "fixed_in_hardware": true,
+    "provenance": "datasheet"
+  },
+
+  "rails": [{ "id": "VBAT", "v": 3.7, "source": "cell", "rating_ma": 2000 }],
+
+  "loads": [
+    { "id": "mcu", "rail": "VBAT", "i_avg_ma": 40.0, "i_peak_ma": 80.0, "provenance": "datasheet" }
+  ],
+
+  "states": [
+    { "id": "idle", "duty": 1.0, "ma": 40.0, "provenance": "datasheet" }
+  ]
+}

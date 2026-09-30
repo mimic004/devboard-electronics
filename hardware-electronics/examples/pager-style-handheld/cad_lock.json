@@ -1,0 +1,812 @@
+{
+  "schema": "hardware-electronics/cad-lock",
+  "version": "1.0",
+  "manifest_hash": "sha256:ba97059426065df73e9e4cb819be81bf147dc95e8f7e8bd200de47abd002592a",
+  "written": "2026-09-27T11:02:34-06:00",
+  "canonical": {
+    "assembly": {
+      "header_removal_note": "The 2x20 female header is removed late, after the board has been powered and identified. A board that has never been powered on should not be modified.",
+      "header_removed": true
+    },
+    "assembly_order": [
+      {
+        "irreversible": false,
+        "step": 1,
+        "what": "Power and identify the bare board over USB; back up the factory flash.",
+        "why_this_order": "A board that has never been powered on should not be modified, and factory firmware cannot be recovered after it is overwritten."
+      },
+      {
+        "irreversible": false,
+        "step": 2,
+        "what": "Print and check the fit coupons for the speaker ring and the USB channel.",
+        "why_this_order": "Ten minutes here saves a ten-hour mistake. Both features are press fits against parts whose dimensions were not originally measured."
+      },
+      {
+        "irreversible": true,
+        "step": 3,
+        "what": "Remove the 2x20 header: cut the plastic body away, snip the stubs, then desolder pins one at a time.",
+        "why_this_order": "Do this late, not early. Bulk-desoldering 40 through-hole pins at once lifts pads, and the board must be known good first."
+      },
+      {
+        "irreversible": false,
+        "step": 4,
+        "what": "Kapton-tape the pin stubs before the cell goes anywhere near them.",
+        "why_this_order": "A pouch cell against sharp pin stubs is a puncture risk."
+      },
+      {
+        "irreversible": false,
+        "step": 5,
+        "what": "Meter the battery lead polarity, then fit the cell and close the back shell.",
+        "why_this_order": "Last, because everything above needs the bay empty."
+      }
+    ],
+    "assertions": [
+      {
+        "blocking": true,
+        "check": "clearance",
+        "id": "spk-air-gap",
+        "max_mm": 0.8,
+        "min_mm": 0.3,
+        "owner": "cad",
+        "subject": "speaker",
+        "target": "grille_inner_face"
+      },
+      {
+        "blocking": true,
+        "check": "no_intersect",
+        "id": "antenna-clear",
+        "owner": "cad",
+        "subject": "lora_ufl",
+        "target": [
+          "battery",
+          "speaker.magnet_rf",
+          "motor"
+        ]
+      },
+      {
+        "blocking": true,
+        "check": "no_intersect_in_plan",
+        "id": "batt-clear-of-usb",
+        "owner": "cad",
+        "subject": "battery",
+        "target": "usb_channel"
+      },
+      {
+        "blocking": true,
+        "check": "min_wall",
+        "id": "wall-min",
+        "min_mm": 1.2,
+        "owner": "cad",
+        "subject": "enclosure"
+      },
+      {
+        "blocking": true,
+        "check": "material_not_in",
+        "id": "no-filled-filament",
+        "owner": "cad",
+        "subject": "enclosure",
+        "values": [
+          "carbon_filled",
+          "glass_filled",
+          "metal_filled"
+        ]
+      }
+    ],
+    "cable_runs": [
+      {
+        "awg": 28,
+        "bundle_d_mm": 2.4,
+        "channel_min": {
+          "h": 3,
+          "w": 4
+        },
+        "conductors": 2,
+        "connector": {
+          "pins": 2,
+          "pitch_mm": 1.25,
+          "polarity_verified": true,
+          "type": "SH1.25"
+        },
+        "from": "battery.lead",
+        "id": "batt_to_jp1",
+        "min_bend_r_mm": 6,
+        "must_avoid": [
+          "usb_channel",
+          "antenna_channel"
+        ],
+        "path_hint": [
+          "batt_bay_+X",
+          "under_module_deck"
+        ],
+        "slack_mm": 8,
+        "to": "mainboard.JP1"
+      },
+      {
+        "awg": 30,
+        "bundle_d_mm": 1.8,
+        "channel_min": {
+          "h": 2,
+          "w": 6
+        },
+        "conductors": 2,
+        "from": "speaker.pads",
+        "id": "spk_to_amp",
+        "min_bend_r_mm": 4,
+        "slack_mm": 6,
+        "to": "amp.OUT"
+      }
+    ],
+    "components": [
+      {
+        "bom_ref": "mainboard",
+        "cad_parameters": {
+          "board_l": "footprint.l",
+          "board_t": "footprint.h",
+          "board_w": "footprint.w",
+          "usb_ch_w": "openings.usb_channel.w",
+          "usb_recept_h": "openings.usb_channel.centreline_z",
+          "win_l": "openings.display_window.l",
+          "win_offset_x": "openings.display_window.offset.x",
+          "win_w": "openings.display_window.w"
+        },
+        "class": "pcb",
+        "drives_cad": true,
+        "electrical": {
+          "i_avg_ma": 1.09,
+          "i_peak_ma": 220,
+          "rail": "VBAT",
+          "v_max": 4.3,
+          "v_min": 3
+        },
+        "footprint": {
+          "h": 1.6,
+          "l": 87.96,
+          "provenance": {
+            "h": "measured",
+            "l": "datasheet",
+            "w": "datasheet"
+          },
+          "shape": "rect",
+          "tolerance": 0.4,
+          "verify_before": "print",
+          "w": 36.63
+        },
+        "id": "mainboard",
+        "keepouts": [
+          {
+            "conditional_on": "assembly.header_removed == false",
+            "h": 9,
+            "id": "header_zone",
+            "kind": "mechanical",
+            "l": 51.36,
+            "offset": {
+              "x": 0,
+              "y": -14
+            },
+            "ref": "underside",
+            "shape": "rect",
+            "w": 5.6
+          },
+          {
+            "h": 6,
+            "id": "connector_edge",
+            "kind": "access",
+            "l": 20,
+            "offset": {
+              "x": -34,
+              "y": 0
+            },
+            "ref": "-X edge",
+            "shape": "rect",
+            "w": 36.63
+          }
+        ],
+        "mounting": {
+          "features": [
+            {
+              "kind": "rib_frame",
+              "thickness": 1.2,
+              "z_bot": 11,
+              "z_top": 13.5
+            },
+            {
+              "count": 6,
+              "kind": "flex_clip",
+              "ledge": 0.8,
+              "wall": "+Y/-Y"
+            }
+          ],
+          "method": "rib_frame"
+        },
+        "openings": [
+          {
+            "bezel_overlap": 1.1,
+            "id": "display_window",
+            "kind": "window",
+            "l": 69.1,
+            "offset": {
+              "x": -3.05,
+              "y": 0
+            },
+            "provenance": "measured:2026-09-19:printed-coupon",
+            "shape": "rect",
+            "tolerance": 0.4,
+            "w": 31.26
+          },
+          {
+            "accepts_plug_boot": {
+              "h": 5.86,
+              "w": 12.6
+            },
+            "centreline_z": 13.9,
+            "depth": 11.22,
+            "id": "usb_channel",
+            "kind": "channel",
+            "l": 13,
+            "provenance": "measured",
+            "ref": "-X wall",
+            "shape": "rect",
+            "spec_max_plug_boot": {
+              "h": 6.5,
+              "w": 12.35
+            },
+            "w": 6.26
+          }
+        ],
+        "orientation_constraint": {
+          "axis": "+X",
+          "drives": [
+            "win_offset_x",
+            "usb_side"
+          ],
+          "feature": "eink_fpc",
+          "kind": "feature_axis",
+          "locked": true
+        },
+        "placement": {
+          "face": "front_interior",
+          "owner": "cad",
+          "rotation_z": 0,
+          "seated": "panel_down",
+          "x": 0,
+          "y": 0,
+          "z": 13.5
+        },
+        "rf": [
+          {
+            "band_mhz": [
+              902,
+              928
+            ],
+            "clearance_from": [
+              "battery",
+              "speaker.magnet_rf",
+              "motor"
+            ],
+            "connector": "U.FL",
+            "id": "lora_ufl",
+            "keepout": {
+              "h": 6,
+              "l": 52,
+              "offset": {
+                "x": 0,
+                "y": -28
+              },
+              "shape": "rect",
+              "w": 10
+            },
+            "material_rule": "no carbon-, glass- or metal-filled filament within the keepout",
+            "min_clearance_mm": 5,
+            "status": "confirmed"
+          },
+          {
+            "band_mhz": [
+              2400,
+              2500
+            ],
+            "connector": "unconfirmed",
+            "id": "wifi_24",
+            "status": "UNVERIFIED"
+          }
+        ],
+        "thermal": {
+          "dissipation_mw": 400,
+          "max_ambient_c": 60,
+          "needs_airflow": false
+        }
+      },
+      {
+        "bom_ref": "battery",
+        "cad_parameters": {
+          "batt_l": "footprint.l",
+          "batt_t": "footprint.h",
+          "batt_w": "footprint.w"
+        },
+        "class": "battery",
+        "drives_cad": true,
+        "electrical": {
+          "capacity_mah": 1100,
+          "rail": "VBAT",
+          "v_max": 4.2,
+          "v_min": 3
+        },
+        "footprint": {
+          "h": 7,
+          "l": 50,
+          "provenance": {
+            "h": "measured",
+            "l": "measured",
+            "w": "measured"
+          },
+          "shape": "rect",
+          "tolerance": 0.5,
+          "verify_before": "none",
+          "w": 29
+        },
+        "id": "battery",
+        "keepouts": [
+          {
+            "h": 8.5,
+            "id": "swell_allowance",
+            "kind": "mechanical",
+            "l": 51,
+            "shape": "rect",
+            "w": 30
+          }
+        ],
+        "mounting": {
+          "features": [
+            {
+              "depth": 7.6,
+              "kind": "bay",
+              "wall": 1.2
+            }
+          ],
+          "method": "shallow_bay_with_foam"
+        },
+        "placement": {
+          "face": "back_interior",
+          "owner": "cad",
+          "rotation_z": 0,
+          "x": -20,
+          "y": 18,
+          "z": 0
+        }
+      },
+      {
+        "bom_ref": "speaker",
+        "cad_parameters": {
+          "spk_d": "footprint.d",
+          "spk_t": "footprint.h"
+        },
+        "class": "transducer",
+        "drives_cad": true,
+        "electrical": {
+          "i_peak_ma": 700,
+          "impedance_ohm": 8,
+          "power_w": 1,
+          "rail": "VBAT_via_amp"
+        },
+        "footprint": {
+          "d": 20,
+          "fit_coupon_required": true,
+          "h": 4,
+          "provenance": {
+            "d": "measured",
+            "h": "measured"
+          },
+          "shape": "circle",
+          "tolerance": 0.3,
+          "verify_before": "none"
+        },
+        "id": "speaker",
+        "keepouts": [
+          {
+            "d": 21,
+            "h": 0.8,
+            "id": "air_gap",
+            "kind": "acoustic",
+            "max": 0.8,
+            "min": 0.3,
+            "ref": "front_face",
+            "shape": "cylinder"
+          },
+          {
+            "d": 24,
+            "h": 6,
+            "id": "magnet_rf",
+            "kind": "magnetic",
+            "shape": "cylinder"
+          },
+          {
+            "h": 4,
+            "id": "wire_exit",
+            "kind": "cable",
+            "l": 6,
+            "offset": {
+              "x": 12,
+              "y": 0
+            },
+            "ref": "+X",
+            "shape": "rect",
+            "w": 2
+          }
+        ],
+        "mounting": {
+          "features": [
+            {
+              "bore": 20.6,
+              "h": 3,
+              "kind": "ring",
+              "wall": 1.2
+            }
+          ],
+          "method": "concentric_rings"
+        },
+        "openings": [
+          {
+            "face": "back_exterior",
+            "id": "grille",
+            "kind": "perforation",
+            "min_open_area_mm2": 267,
+            "min_web": 0.8,
+            "must_not_breach": [
+              "front_cavity_seal"
+            ],
+            "pattern": "hex",
+            "target_ratio_of_cone": 0.85
+          }
+        ],
+        "orientation_constraint": {
+          "axis": "-Z",
+          "kind": "radiating_axis",
+          "locked": true
+        },
+        "placement": {
+          "face": "back_interior",
+          "owner": "cad",
+          "rotation_z": 0,
+          "x": 33,
+          "y": -8,
+          "z": 0
+        }
+      },
+      {
+        "bom_ref": "expander",
+        "cad_parameters": {
+          "exp_h": "footprint.h",
+          "exp_l": "footprint.l",
+          "exp_w": "footprint.w"
+        },
+        "class": "module",
+        "drives_cad": true,
+        "electrical": {
+          "i_avg_ma": 1,
+          "i_peak_ma": 2,
+          "rail": "3V3"
+        },
+        "footprint": {
+          "h": 13,
+          "l": 38,
+          "provenance": {
+            "h": "measured",
+            "l": "measured",
+            "w": "measured"
+          },
+          "shape": "rect",
+          "tolerance": 0.4,
+          "verify_before": "none",
+          "w": 23
+        },
+        "id": "expander",
+        "keepouts": [
+          {
+            "h": 13,
+            "id": "terminal_edge",
+            "kind": "access",
+            "l": 38,
+            "offset": {
+              "x": 0,
+              "y": 8.5
+            },
+            "shape": "rect",
+            "w": 6
+          }
+        ],
+        "mounting": {
+          "features": [
+            {
+              "bore": 2,
+              "count": 4,
+              "d": 4,
+              "kind": "boss"
+            }
+          ],
+          "method": "screw_bosses"
+        },
+        "placement": {
+          "face": "back_interior",
+          "owner": "cad",
+          "rotation_z": 0,
+          "x": 25,
+          "y": 22,
+          "z": 0
+        }
+      },
+      {
+        "bom_ref": "motor",
+        "cad_parameters": {
+          "motor_d": "footprint.d",
+          "motor_t": "footprint.h"
+        },
+        "class": "motor",
+        "drives_cad": true,
+        "electrical": {
+          "i_avg_ma": 0,
+          "i_peak_ma": 156,
+          "rail": "3V3_via_haptic"
+        },
+        "footprint": {
+          "d": 10,
+          "h": 3,
+          "provenance": {
+            "d": "measured",
+            "h": "measured"
+          },
+          "shape": "circle",
+          "tolerance": 0.2,
+          "verify_before": "none"
+        },
+        "id": "motor",
+        "mounting": {
+          "features": [
+            {
+              "d": 10.4,
+              "depth": 3.2,
+              "kind": "pocket"
+            }
+          ],
+          "method": "adhesive_pad"
+        },
+        "orientation_constraint": {
+          "axis": "-Z",
+          "kind": "thermal_axis",
+          "locked": true
+        },
+        "placement": {
+          "face": "back_interior",
+          "owner": "cad",
+          "rotation_z": 0,
+          "x": -15,
+          "y": -8,
+          "z": 0
+        }
+      },
+      {
+        "bom_ref": "piezo",
+        "cad_parameters": {
+          "piezo_d": "footprint.d",
+          "piezo_t": "footprint.h"
+        },
+        "class": "transducer",
+        "drives_cad": true,
+        "electrical": {
+          "i_peak_ma": 12,
+          "rail": "3V3"
+        },
+        "footprint": {
+          "d": 15,
+          "h": 2.5,
+          "provenance": {
+            "d": "measured",
+            "h": "measured"
+          },
+          "shape": "circle",
+          "tolerance": 0.2,
+          "verify_before": "none"
+        },
+        "id": "piezo",
+        "mounting": {
+          "features": [
+            {
+              "bore": 15.4,
+              "h": 1.5,
+              "kind": "ring",
+              "wall": 1
+            }
+          ],
+          "method": "rim_clamp"
+        },
+        "orientation_constraint": {
+          "axis": "-Z",
+          "kind": "radiating_axis",
+          "locked": true
+        },
+        "placement": {
+          "face": "back_interior",
+          "owner": "cad",
+          "rotation_z": 0,
+          "x": -40,
+          "y": -15,
+          "z": 0
+        }
+      }
+    ],
+    "datum": {
+      "axes": "+X along the long axis toward the e-ink FPC; +Y across the width; +Z up out of the back shell",
+      "origin": "enclosure_interior_centre_of_split_plane"
+    },
+    "envelope": {
+      "exterior": {
+        "h": 20,
+        "l": 110,
+        "w": 76
+      },
+      "interior": {
+        "h": 16,
+        "l": 106,
+        "w": 72
+      },
+      "material": "PETG",
+      "material_filled": "none",
+      "owner": "cad",
+      "rf_transparent": true,
+      "split_plane_z": 11,
+      "wall": 2
+    },
+    "open_gates": [
+      {
+        "assumed": 18,
+        "conflict": "The datasheet text says 20 uA; the datasheet table and the product page say 18 uA. No independent measurement exists.",
+        "key": "mainboard.sleep_current_ua",
+        "provenance": "vendor_claim",
+        "unit": "uA",
+        "verify_before_build": true
+      },
+      {
+        "assumed": 2000,
+        "key": "mainboard.charge.prog_resistor_ohm",
+        "provenance": "schematic",
+        "unit": "ohm",
+        "verify_before_build": true
+      }
+    ],
+    "project": "pager-style-handheld",
+    "schema": "hardware-electronics/component-manifest",
+    "units": {
+      "angle": "deg",
+      "current": "mA",
+      "length": "mm",
+      "mass": "g",
+      "temp": "C",
+      "voltage": "V"
+    },
+    "version": "1.0"
+  },
+  "scripts": {
+    "board_l": [
+      "pager_enclosure.py"
+    ],
+    "board_w": [
+      "pager_enclosure.py"
+    ],
+    "board_t": [
+      "pager_enclosure.py"
+    ],
+    "win_l": [
+      "pager_enclosure.py"
+    ],
+    "win_w": [
+      "pager_enclosure.py"
+    ],
+    "win_offset_x": [
+      "pager_enclosure.py"
+    ],
+    "usb_ch_w": [
+      "pager_enclosure.py"
+    ],
+    "usb_recept_h": [
+      "pager_enclosure.py"
+    ],
+    "batt_l": [
+      "pager_enclosure.py"
+    ],
+    "batt_w": [
+      "pager_enclosure.py"
+    ],
+    "batt_t": [
+      "pager_enclosure.py"
+    ],
+    "spk_d": [
+      "pager_enclosure.py"
+    ],
+    "spk_t": [
+      "pager_enclosure.py"
+    ],
+    "exp_l": [
+      "pager_enclosure.py"
+    ],
+    "exp_w": [
+      "pager_enclosure.py"
+    ],
+    "exp_h": [
+      "pager_enclosure.py"
+    ],
+    "motor_d": [
+      "pager_enclosure.py"
+    ],
+    "motor_t": [
+      "pager_enclosure.py"
+    ],
+    "piezo_d": [
+      "pager_enclosure.py"
+    ],
+    "piezo_t": [
+      "pager_enclosure.py"
+    ]
+  },
+  "stls": {
+    "board_l": [
+      "pager_p1_front_shell.stl",
+      "pager_p2_back_shell.stl"
+    ],
+    "board_w": [
+      "pager_p1_front_shell.stl",
+      "pager_p2_back_shell.stl"
+    ],
+    "board_t": [
+      "pager_p1_front_shell.stl"
+    ],
+    "win_l": [
+      "pager_p1_front_shell.stl"
+    ],
+    "win_w": [
+      "pager_p1_front_shell.stl"
+    ],
+    "win_offset_x": [
+      "pager_p1_front_shell.stl"
+    ],
+    "usb_ch_w": [
+      "pager_p1_front_shell.stl"
+    ],
+    "usb_recept_h": [
+      "pager_p1_front_shell.stl"
+    ],
+    "batt_l": [
+      "pager_p2_back_shell.stl"
+    ],
+    "batt_w": [
+      "pager_p2_back_shell.stl"
+    ],
+    "batt_t": [
+      "pager_p2_back_shell.stl"
+    ],
+    "spk_d": [
+      "pager_p2_back_shell.stl"
+    ],
+    "spk_t": [
+      "pager_p2_back_shell.stl"
+    ],
+    "exp_l": [
+      "pager_p2_back_shell.stl"
+    ],
+    "exp_w": [
+      "pager_p2_back_shell.stl"
+    ],
+    "exp_h": [
+      "pager_p2_back_shell.stl"
+    ],
+    "motor_d": [
+      "pager_p2_back_shell.stl"
+    ],
+    "motor_t": [
+      "pager_p2_back_shell.stl"
+    ],
+    "piezo_d": [
+      "pager_p2_back_shell.stl"
+    ],
+    "piezo_t": [
+      "pager_p2_back_shell.stl"
+    ]
+  }
+}

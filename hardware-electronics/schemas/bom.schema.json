@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hardware-electronics/bom.schema.json",
+  "title": "Bill of materials (phase 2)",
+  "description": "The BOM is the join table between electronics and CAD. drives_cad makes the coupling machine-readable instead of a Markdown column nothing validates.",
+  "type": "object",
+  "required": ["schema", "version", "project", "rows"],
+  "$defs": {
+    "provenance": {
+      "enum": ["assumed", "inferred", "seller_claimed", "vendor_claim", "simulated", "datasheet", "schematic", "measured"]
+    }
+  },
+  "properties": {
+    "schema": { "const": "hardware-electronics/bom" },
+    "version": { "type": "string" },
+    "project": { "type": "string" },
+    "generated": { "type": "string" },
+    "accepted_findings": {
+      "description": "Advisory findings accepted on purpose, each with a written reason.",
+      "type": "object",
+      "additionalProperties": { "type": "string", "minLength": 10 }
+    },
+    "enclosure": {
+      "type": "object",
+      "properties": {
+        "printed": { "type": "boolean" },
+        "material": {
+          "description": "Filament family. Filled filaments are lossy at 2.4 GHz and are a veto when an RF part is present.",
+          "type": "string"
+        },
+        "material_filled": { "enum": ["none", "carbon_filled", "glass_filled", "metal_filled", "wood_filled"] }
+      }
+    },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "description", "qty"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+          "description": { "type": "string" },
+          "qty": { "type": "integer", "minimum": 1 },
+          "mpn": { "type": ["string", "null"] },
+          "part_ref": {
+            "description": "Filename stem in parts/ carrying this part's geometry and electrical facts.",
+            "type": ["string", "null"]
+          },
+          "supplier_url": { "type": ["string", "null"] },
+          "unit_cost_usd": { "type": ["number", "null"], "minimum": 0 },
+
+          "variant": {
+            "description": "An axis of choice that is irreversible once ordered - frequency band, voltage, connector pitch, diameter.",
+            "type": "object",
+            "required": ["axis", "locked_at_order"],
+            "properties": {
+              "axis": { "type": "string" },
+              "chosen": { "type": ["string", "number", "null"] },
+              "locked_at_order": { "type": "boolean" },
+              "options": { "type": "array", "items": { "type": ["string", "number"] } },
+              "alternatives_rejected": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "value": { "type": ["string", "number"] },
+                    "why": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+
+          "footprint": {
+            "type": "object",
+            "properties": {
+              "shape": { "enum": ["rect", "box", "circle", "cylinder", "polygon"] },
+              "l": { "type": "number", "exclusiveMinimum": 0 },
+              "w": { "type": "number", "exclusiveMinimum": 0 },
+              "h": { "type": "number", "exclusiveMinimum": 0 },
+              "d": { "type": "number", "exclusiveMinimum": 0 },
+              "tolerance": { "type": "number", "minimum": 0 },
+              "height_includes": {
+                "description": "For W x L x H parts whose H may or may not include a plunger, boss or shaft. Declaring it is how the 3.8 mm switch that was 1.9 mm too tall gets caught.",
+                "enum": ["body_only", "to_plunger_top", "to_shaft_top", "over_connector", "unknown"]
+              },
+              "provenance": {
+                "oneOf": [
+                  { "$ref": "#/$defs/provenance" },
+                  { "type": "object", "additionalProperties": { "$ref": "#/$defs/provenance" } }
+                ]
+              },
+              "verify_before": { "enum": ["order", "print", "solder", "assembly", "none"] },
+              "fit_coupon_required": { "type": "boolean" }
+            }
+          },
+
+          "connector": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" },
+              "pitch_mm": { "type": "number" },
+              "pins": { "type": "integer", "minimum": 1 },
+              "gender": { "enum": ["plug", "socket", "solder_pad", "wire_lead", "header", "none"] },
+              "net": { "type": "string" },
+              "polarity_verified": { "type": "boolean" },
+              "mates_with": { "type": ["string", "null"] }
+            }
+          },
+
+          "electrical": {
+            "type": "object",
+            "properties": {
+              "rail": { "type": "string" },
+              "v_min": { "type": "number" },
+              "v_max": { "type": "number" },
+              "logic_v": { "type": "number" },
+              "i_avg_ma": { "type": "number", "minimum": 0 },
+              "i_peak_ma": { "type": "number", "minimum": 0 },
+              "capacity_mah": { "type": "number", "minimum": 0 },
+              "impedance_ohm": { "type": "number" },
+              "power_w": { "type": "number" }
+            }
+          },
+
+          "rf": {
+            "type": "object",
+            "properties": {
+              "band_mhz": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+              "transmits": { "type": "boolean" },
+              "antenna": { "enum": ["ufl", "sma", "spring", "pcb_trace", "chip", "wire", "unconfirmed"] }
+            }
+          },
+
+          "drives_cad": {
+            "description": "The machine-readable version of the 'Drives CAD' column. Naming a parameter here is what lets a substitution be caught before it is printed around.",
+            "type": ["object", "boolean"],
+            "properties": {
+              "parameters": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+              "owner_script": { "type": "string" }
+            }
+          },
+
+          "failure_mode": {
+            "description": "'silent' means the part can die without producing any error. Such a part requires a declared liveness check.",
+            "enum": ["loud", "silent", "degraded", "unknown"]
+          },
+          "liveness_check": {
+            "type": "object",
+            "properties": {
+              "required": { "type": "boolean" },
+              "how": { "type": "string" }
+            }
+          },
+
+          "order_plan": {
+            "type": "object",
+            "properties": {
+              "order_one_first": { "type": "boolean" },
+              "reason": { "type": "string" }
+            }
+          },
+
+          "notes": { "type": "string" },
+          "substitution_trap": { "type": "string" }
+        }
+      }
+    }
+  }
+}

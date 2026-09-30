@@ -1,0 +1,41 @@
+{
+  "schema": "hardware-electronics/power",
+  "version": "1.0",
+  "project": "fixture-amp-on-ldo",
+
+  "battery": {
+    "chemistry": "lipo",
+    "capacity_mah": 500,
+    "protection": true,
+    "usable_fraction": 0.85,
+    "max_discharge_ma": 1000
+  },
+
+  "charge": {
+    "ic": "LGS4056H",
+    "ma": 600,
+    "prog_resistor_ohm": 2000,
+    "prog_constant": 1200,
+    "fixed_in_hardware": true,
+    "provenance": "schematic",
+    "source": "R18 = 2 kOhm on PROG."
+  },
+
+  "rails": [
+    { "id": "VBAT", "v": 3.7, "source": "cell", "rating_ma": 1000 },
+    { "id": "3V3", "v": 3.3, "from": "VBAT", "source": "CE6260B33M", "rating_ma": 600, "rating_provenance": "datasheet" }
+  ],
+
+  "loads": [
+    { "id": "mainboard", "rail": "VBAT", "i_avg_ma": 40.0, "i_peak_ma": 220.0, "provenance": "datasheet", "bulk_uf": 100 },
+    { "id": "amp_max98357a", "rail": "3V3", "i_avg_ma": 2.4, "i_peak_ma": 1000.0, "provenance": "datasheet" },
+    { "id": "motor", "rail": "3V3", "i_avg_ma": 0.0, "i_peak_ma": 156.0, "provenance": "seller_claimed", "inductive": true }
+  ],
+
+  "states": [
+    { "id": "deep_sleep", "duty": 0.5, "ma": 0.018, "provenance": "vendor_claim" },
+    { "id": "active", "duty": 0.4, "ma": 120.0, "provenance": "datasheet" }
+  ],
+
+  "requirements": { "runtime_target_days": 7, "min_margin_x": 1.5 }
+}

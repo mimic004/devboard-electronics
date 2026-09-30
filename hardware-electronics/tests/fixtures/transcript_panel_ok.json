@@ -1,0 +1,36 @@
+{
+  "schema": "hardware-electronics/serial-transcript",
+  "version": "1.0",
+  "port": "COM7",
+  "recorded": "2026-09-24T19:30:00-06:00",
+  "note": "The same probe with Vext actually asserted. BUSY asserts after 4 ms and stays busy for 1180 ms, which is inside the 300-3000 ms plausibility band. This is what a real refresh looks like.",
+  "banner": ["probe.ready 1.0"],
+  "exchanges": [
+    {
+      "tx": "PROBE rail 18 high",
+      "rx": [
+        "probe.rail.pin 18",
+        "probe.rail.before low",
+        "probe.rail.after high",
+        "probe.rail.changed yes",
+        "probe.rail.settle_ms 100",
+        "probe.done rail ok"
+      ]
+    },
+    {
+      "tx": "PROBE busy 6 18 active_high 5000",
+      "rx": [
+        "probe.busy.busy_pin 6",
+        "probe.busy.trigger_pin 18",
+        "probe.busy.sense active_high",
+        "probe.busy.timeout_ms 5000",
+        "probe.busy.asserted yes",
+        "probe.busy.assert_ms 4",
+        "probe.busy.released yes",
+        "probe.busy.busy_ms 1180",
+        "probe.busy.elapsed_ms 1184",
+        "probe.done busy ok"
+      ]
+    }
+  ]
+}

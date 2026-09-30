@@ -1,0 +1,116 @@
+{
+  "_comment": "A fully worked corroboration record, annotated. Copy the shape, not the content. This is the real record for the Heltec Vision Master E290 as installed in the parent skill, which is the only profile in the shipped set that meets the 3-independent-source bar for a GPIO map honestly.",
+
+  "sources": [
+    {
+      "id": "ds",
+      "kind": "datasheet",
+      "ref": "Heltec Vision Master E290 datasheet, section 2.2 (pin map) and section 1.2 / table 3.2 (power)",
+      "_comment": "Cite the SECTION. 'the datasheet' is not a citation you can re-check."
+    },
+    {
+      "id": "sch",
+      "kind": "schematic",
+      "ref": "Heltec E290 schematic",
+      "revision": "V0.3.1",
+      "_comment": "A schematic without a revision may describe hardware you do not have. An earlier revision of this one could not attribute R_PROG and led to a charge-current estimate that was out by a factor of two."
+    },
+    {
+      "id": "arduino",
+      "kind": "variant_header",
+      "ref": "espressif/arduino-esp32 variants/heltec_vision_master_e290/pins_arduino.h",
+      "_comment": "Strong: this is what the toolchain actually compiles against."
+    },
+    {
+      "id": "meshtastic",
+      "kind": "community_firmware",
+      "ref": "meshtastic/firmware variants/esp32s3/heltec_vision_master_e290/variant.h",
+      "_comment": "Strongest documentary source. Its authors did not write the vendor's documents and would have complained if the numbers were wrong."
+    },
+    {
+      "id": "silicon",
+      "kind": "measurement",
+      "ref": "esp_flash_get_size() via the bring-up sketch on COM7, 2026-09-17",
+      "_comment": "Only a measurement settles an argument outright."
+    },
+    {
+      "id": "product_page",
+      "kind": "product_page",
+      "ref": "Heltec product page and FAQ",
+      "note": "Boilerplate shared across Heltec's whole ESP32 range. Contradicts the schematic on the charge IC.",
+      "_comment": "Recorded so its claims can be IDENTIFIED, not counted. product_page never contributes to a threshold."
+    }
+  ],
+
+  "groups": {
+    "gpio_map": {
+      "sources": ["ds", "sch", "arduino", "meshtastic"],
+      "agreement": "full",
+      "checked": "2026-09-17",
+      "note": "Every GPIO assignment confirmed by at least three of these four.",
+      "_comment": "Four independent sources against a threshold of three. Cite only the sources actually consulted FOR THIS GROUP - a datasheet read for the pin map does not corroborate the power section."
+    },
+    "power": {
+      "sources": ["sch", "ds"],
+      "agreement": "partial",
+      "checked": "2026-09-19",
+      "_comment": "'partial' because the charge path is solid but the sleep current is disputed. The disagreement is written out below rather than averaged away."
+    },
+    "radio": {
+      "sources": ["ds", "meshtastic"],
+      "agreement": "conflicting",
+      "checked": "2026-09-19",
+      "_comment": "'conflicting' REQUIRES a matching contradictions entry. The linter reports CONFLICT_UNRECORDED otherwise."
+    }
+  },
+
+  "conservative": false,
+  "_conservative_comment": "Set true only for a profile that OVER-reserves: one that marks a pin consumed when unsure. That fails safe - it refuses a pin that would have worked - so the threshold drops to one source. It also requires conservative_rationale. The reverse is never allowed: a profile may not bless pins as free on weak evidence.",
+
+  "contradictions": [
+    {
+      "field": "power.sleep_current_ua",
+      "readings": [
+        { "value": 18, "source": "ds", "note": "Table 3.2 and the product page" },
+        { "value": 20, "source": "ds", "note": "Section 1.2 body text" }
+      ],
+      "resolution": "unresolved",
+      "impact": "Dominates the long tail of any battery-life estimate. power_budget.py reports a runtime RANGE rather than a point estimate because of this.",
+      "how_to_close": "Meter in series with the battery positive lead, uA range, USB DISCONNECTED.",
+      "_comment": "The vendor disagrees with ITSELF in one document. Both readings are recorded. Neither is presented as fact, and the parent skill surfaces this into every design report as BOARD_CONTRADICTION."
+    },
+    {
+      "field": "power.charge.ic",
+      "readings": [
+        { "value": "LGS4056H", "source": "sch" },
+        { "value": "MCP73831 / TP4054", "source": "product_page", "note": "Generic boilerplate identical across unrelated Heltec products" }
+      ],
+      "resolution": "chosen",
+      "resolved_value": "LGS4056H",
+      "resolved_by": "The schematic names the part actually fitted; the FAQ page is boilerplate that is identical across unrelated products, so it is not a source about this board.",
+      "impact": "Sets the charge-current formula and therefore the minimum safe cell capacity.",
+      "_comment": "'chosen' is weaker than 'measured' and must look weaker. resolved_by is mandatory - the linter reports CONTRADICTION_CHOSEN_BLINDLY without it."
+    },
+    {
+      "field": "mcu.flash_mb",
+      "readings": [
+        { "value": 16, "source": "product_page" },
+        { "value": 8, "source": "silicon" }
+      ],
+      "resolution": "measured",
+      "resolved_value": 8,
+      "resolved_by": "esp_flash_get_size() on the physical board. Silicon beats both documents.",
+      "impact": "Partition layout. Believing 16 MB would silently truncate an OTA partition.",
+      "_comment": "The cleanest kind of resolution. Note the direction: the LISTING was wrong, and it was wrong in the flattering direction."
+    }
+  ],
+
+  "open_questions": [
+    {
+      "question": "Verify R18 on the physical board reads 2 kOhm.",
+      "impact": "Confirms the charge current, which is a battery-safety number currently resting on a schematic reading.",
+      "blocks_active": false,
+      "_comment": "An open question is something nobody has LOOKED UP, as opposed to a contradiction, which is something sources disagree about. Set blocks_active true when the profile must not go active until it is answered."
+    }
+  ]
+}

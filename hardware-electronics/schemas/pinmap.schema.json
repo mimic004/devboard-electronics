@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hardware-electronics/pinmap.schema.json",
+  "title": "Pin map and bus allocation (phase 4)",
+  "description": "Validated against a boards/*.json profile. A pin question is never answerable without a board ID: GPIO 7 is a panel power-enable on one board and a battery-sense input on another.",
+  "type": "object",
+  "required": ["schema", "version", "board", "nets"],
+  "properties": {
+    "schema": { "const": "hardware-electronics/pinmap" },
+    "version": { "type": "string" },
+    "project": { "type": "string" },
+    "board": {
+      "description": "Filename stem in boards/. Mandatory. There is no default.",
+      "type": "string",
+      "minLength": 1
+    },
+
+    "radio": {
+      "type": "object",
+      "properties": {
+        "wifi": { "type": "boolean", "default": false },
+        "ble": { "type": "boolean", "default": false },
+        "lora": { "type": "boolean", "default": false }
+      }
+    },
+
+    "console": {
+      "description": "usb_cdc frees the UART0 pins; uart0 consumes them.",
+      "enum": ["usb_cdc", "uart0", "none"],
+      "default": "usb_cdc"
+    },
+
+    "deep_sleep": { "type": "boolean", "default": false },
+
+    "nets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["net", "pin"],
+        "properties": {
+          "net": { "type": "string", "minLength": 1 },
+          "pin": { "type": ["integer", "string"] },
+          "mode": {
+            "enum": ["input", "input_pullup", "input_pulldown", "output", "output_od", "bidir", "analog", "nc"],
+            "default": "bidir"
+          },
+          "external_pull": { "enum": ["up", "down", "none"], "default": "none" },
+          "external_pull_ohm": { "type": ["number", "null"] },
+          "logic_v": { "type": "number" },
+          "part_ref": { "type": "string" },
+          "bus_ref": {
+            "description": "Set when this net is one signal of a bus declared in buses[]. Stops the same physical pin reading as double-booked.",
+            "type": "string"
+          },
+          "shared": {
+            "description": "Deliberate sharing, such as a wake line diode-OR'd with a button. Every claim on the pin must set it, so the sharing is visible rather than accidental.",
+            "type": "boolean",
+            "default": false
+          },
+          "note": { "type": "string" }
+        }
+      }
+    },
+
+    "buses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["kind", "id"],
+        "properties": {
+          "kind": { "enum": ["i2c", "spi", "i2s", "uart", "onewire"] },
+          "id": { "type": "string" },
+          "hz": { "type": "number", "exclusiveMinimum": 0 },
+          "sda": { "type": "integer" },
+          "scl": { "type": "integer" },
+          "sck": { "type": "integer" },
+          "mosi": { "type": "integer" },
+          "miso": { "type": "integer" },
+          "bclk": { "type": "integer" },
+          "ws": { "type": "integer" },
+          "sd": { "type": "integer" },
+          "tx": { "type": "integer" },
+          "rx": { "type": "integer" },
+          "logic_v": { "type": "number" },
+          "pullup_ohm": { "type": ["number", "null"] },
+          "pullup_source": { "type": "string" },
+          "devices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["ref"],
+              "properties": {
+                "ref": { "type": "string" },
+                "addr": { "type": "string", "pattern": "^0[xX][0-9a-fA-F]{1,2}$" },
+                "cs": { "type": "integer" },
+                "part_ref": { "type": "string" },
+                "logic_v": { "type": "number" },
+                "onboard_pullup_ohm": { "type": ["number", "null"] }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "analog_inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["net", "pin"],
+        "properties": {
+          "net": { "type": "string" },
+          "pin": { "type": "integer" },
+          "purpose": { "type": "string" }
+        }
+      }
+    },
+
+    "wake_sources": {
+      "description": "Deep-sleep wake pins. On ESP32-S3 only GPIO0-21 are RTC-capable, so an expander interrupt cannot live on GPIO44.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["net", "pin"],
+        "properties": {
+          "net": { "type": "string" },
+          "pin": { "type": "integer" },
+          "kind": { "enum": ["ext0", "ext1", "gpio", "timer", "touch"] }
+        }
+      }
+    },
+
+    "accepted_findings": {
+      "description": "Advisory findings this design accepts on purpose, each with a written reason. Only advisory codes may be accepted - JTAG_COST, PIN_STRAPPING, I2C_PULLUP_STACKED, I2C_PULLUP_WEAK, BOARD_SUPERSEDED. Accepting an error is not possible, and an acceptance that never fires is itself reported.",
+      "type": "object",
+      "additionalProperties": { "type": "string", "minLength": 10 }
+    },
+
+    "required_pins": {
+      "description": "Declared demand, used for the pin-budget check. Lets the tool say how many pins short you are before you discover it by running out.",
+      "type": "object",
+      "properties": {
+        "digital": { "type": "integer", "minimum": 0 },
+        "analog": { "type": "integer", "minimum": 0 },
+        "reason": { "type": "string" }
+      }
+    }
+  }
+}

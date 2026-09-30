@@ -1,0 +1,74 @@
+{
+  "schema": "hardware-electronics/bom",
+  "version": "1.0",
+  "project": "vendor-sensor-enclosure",
+  "generated": "2026-09-27",
+
+  "enclosure": {
+    "printed": true,
+    "material": "PLA",
+    "material_filled": "none"
+  },
+
+  "rows": [
+    {
+      "id": "zigbee_sensor",
+      "description": "Aqara MCCGQ11LM Zigbee door/window contact sensor (body plus magnet)",
+      "qty": 1,
+      "mpn": "MCCGQ11LM",
+      "part_ref": "aqara-mccgq11lm",
+      "unit_cost_usd": 15.0,
+      "footprint": {
+        "shape": "rect",
+        "l": 41.0,
+        "w": 22.0,
+        "h": 11.0,
+        "height_includes": "body_only",
+        "provenance": { "l": "measured", "w": "measured", "h": "measured" },
+        "verify_before": "none"
+      },
+      "electrical": {
+        "rail": "internal",
+        "v_min": 2.0,
+        "v_max": 3.3
+      },
+      "rf": {
+        "band_mhz": [2400, 2500],
+        "transmits": true,
+        "antenna": "pcb_trace"
+      },
+      "drives_cad": {
+        "parameters": ["sensor_l", "sensor_w", "sensor_h", "sensor_recess"],
+        "owner_script": "med_box.py"
+      },
+      "failure_mode": "silent",
+      "liveness_check": {
+        "required": true,
+        "how": "A home-automation automation on last_seen, plus a battery-level alert. A dead Zigbee sensor fails silently: without that automation you would simply stop getting reminders and never find out why - and the failure looks exactly like remembering to take your medication."
+      },
+      "notes": "Self-powered from its own CR1632. It contributes nothing to a power budget, which is why this project legitimately skips phase 3 rather than inventing one. The cell is in a screwless snap shell, so the design must never trap the sensor."
+    },
+
+    {
+      "id": "lid_magnet",
+      "description": "Neodymium block magnet, 20 x 10 x 3 mm, N35",
+      "qty": 1,
+      "unit_cost_usd": 1.2,
+      "footprint": {
+        "shape": "rect",
+        "l": 20.0,
+        "w": 10.0,
+        "h": 3.0,
+        "height_includes": "body_only",
+        "provenance": { "l": "measured", "w": "measured", "h": "measured" },
+        "verify_before": "none"
+      },
+      "drives_cad": {
+        "parameters": ["magnet_l", "magnet_w", "magnet_h"],
+        "owner_script": "med_box.py"
+      },
+      "failure_mode": "loud",
+      "notes": "The vendor's own magnet works, but is awkward to mount in a printed lid. A bare block magnet in a pocket is easier and the release distance is unchanged as long as the pole faces the sensor's marked face. Glue it: a magnet that falls out of a lid pocket is a sensor that reports the box permanently open."
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "schema": "hardware-electronics/project",
+  "version": "1.0",
+  "project": "vendor-sensor-enclosure",
+  "created": "2026-09-27",
+  "summary": "A printed pill box whose lid is watched by an off-the-shelf Zigbee contact sensor. No MCU, no firmware, no rails, no wiring. The entire electronics contribution is: which way round does the sensor go, what must the plastic not do to it, and what happens when it dies quietly.",
+
+  "voltage_class": {
+    "max_v": 3.0,
+    "kind": "dc",
+    "mains_involved": false,
+    "source": "A single CR1632 coin cell inside the vendor sensor. Nothing else in the build is powered."
+  },
+
+  "application": {
+    "description": "A medication REMINDER. It watches a lid and nags a phone. It does not dispense, meter, schedule or withhold anything.",
+    "safety_critical": false,
+    "safety_category": "none"
+  },
+
+  "tools": {
+    "multimeter": false,
+    "multimeter_ua_range": false,
+    "calipers": true,
+    "soldering_iron": false,
+    "logic_analyzer": false,
+    "oscilloscope": false,
+    "bench_psu_current_limited": false,
+    "usb_serial_adapter": false,
+    "3d_printer": true
+  },
+
+  "enclosure": {
+    "required": true,
+    "printed": true,
+    "material": "PLA",
+    "cad_skill": "parametric-3d-printing"
+  },
+
+  "skipped": [
+    {
+      "phase": 3,
+      "reason": "The only active part is a vendor sensor with its own CR1632 coin cell. There are no rails to balance, no charge current to check and no runtime to compute. The sensor's battery life is the vendor's problem; ours is noticing when it ends."
+    },
+    {
+      "phase": 4,
+      "reason": "There is no MCU in this build, so there is no pin map and no bus to allocate."
+    },
+    {
+      "phase": 5,
+      "reason": "There is no harness. Nothing is wired to anything: the sensor is a sealed vendor module and the magnet is a passive lump of neodymium."
+    },
+    {
+      "phase": 6,
+      "reason": "There is no board to bring up. The sensor is commissioned by pairing it to a Zigbee coordinator, not by flashing it."
+    },
+    {
+      "phase": 7,
+      "reason": "There are no peripherals to probe. The equivalent check is a home-automation last_seen alert plus a battery-level alert - see the liveness_check on the BOM row."
+    }
+  ]
+}

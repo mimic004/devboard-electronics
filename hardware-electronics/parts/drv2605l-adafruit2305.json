@@ -1,0 +1,100 @@
+{
+  "schema": "hardware-electronics/part",
+  "version": "1.0",
+  "id": "drv2605l-adafruit2305",
+  "description": "DRV2605L I2C haptic motor driver breakout",
+  "vendor": "Adafruit",
+  "sku": "2305",
+  "mpn": "DRV2605L",
+  "class": "haptic",
+  "footprint": {
+    "shape": "rect",
+    "l": 20.0,
+    "w": 18.0,
+    "h": 3.0,
+    "height_includes": "body_only",
+    "provenance": {
+      "l": "vendor_claim",
+      "w": "vendor_claim",
+      "h": "assumed"
+    }
+  },
+  "logic_v": 3.3,
+  "level_tolerant_5v": true,
+  "electrical": {
+    "rail": "3V3",
+    "v_min": 2.0,
+    "v_max": 5.2,
+    "i_avg_ma": 0.5,
+    "i_peak_ma": 160,
+    "provenance": "datasheet",
+    "bulk_uf_recommended": 10,
+    "note": "The driver itself is small; the MOTOR is the transient. A typical coin ERM motor draws roughly 100-156 mA at start, which is well above the 100 mA threshold that demands local bulk capacitance."
+  },
+  "i2c": {
+    "addresses": [
+      "0x5A"
+    ],
+    "default": "0x5A",
+    "address_select": "Fixed. Two DRV2605Ls cannot share a bus without an I2C multiplexer.",
+    "onboard_pullup_ohm": 10000
+  },
+  "failure_mode": "silent",
+  "liveness_check": {
+    "required": true,
+    "how": "A haptic that stops buzzing produces no error. Read back the device ID register on boot, and make at least one startup pulse observable to the user."
+  },
+  "traps": [
+    "The address is FIXED at 0x5A. Check it against everything else on the bus before committing.",
+    "The motor is an inductive load. It needs a flyback path and local bulk capacitance, sited at the driver, not at the battery connector.",
+    "A vibration motor is a mechanical noise source. It will be heard by any unsealed microphone in the same enclosure."
+  ],
+  "notes": [
+    "Set the LRA/ERM mode and run the auto-calibration for the specific motor. A driver configured for the wrong motor type works badly rather than failing, which is the worst kind of wrong."
+  ],
+  "sources": [
+    "TI DRV2605L datasheet (fixed 0x5A address, supply range)",
+    "reference project A, docs/bom.md (motor start current ~100-156 mA; needs local bulk cap)"
+  ],
+  "corroboration": {
+    "sources": [
+      {
+        "id": "ti",
+        "kind": "datasheet",
+        "ref": "TI DRV2605L datasheet: fixed 0x5A address, supply range"
+      },
+      {
+        "id": "ref_project_a",
+        "kind": "community_firmware",
+        "ref": "reference project A docs/bom.md: coin ERM motor start current roughly 100-156 mA, needs local bulk capacitance"
+      }
+    ],
+    "groups": {
+      "addressing": {
+        "sources": [
+          "ti"
+        ],
+        "agreement": "full",
+        "note": "Fixed address. Two on one bus needs a multiplexer."
+      },
+      "electrical": {
+        "sources": [
+          "ti",
+          "ref_project_a"
+        ],
+        "agreement": "full"
+      },
+      "footprint": {
+        "sources": [
+          "ti"
+        ],
+        "agreement": "full",
+        "note": "Breakout outline is vendor_claim."
+      }
+    },
+    "conservative": false,
+    "contradictions": [],
+    "open_questions": []
+  },
+  "status": "active"
+}

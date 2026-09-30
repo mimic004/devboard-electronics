@@ -1,0 +1,17 @@
+{
+  "schema": "hardware-electronics/tool-transcript",
+  "version": "1.0",
+  "note": "The same board reporting 16 MB. Either the profile is wrong or a different board is plugged in - and either way the answer is that SILICON WINS and the profile gets corrected with a recorded supersession.",
+  "commands": [
+    {
+      "match": "chip[-_]id",
+      "returncode": 0,
+      "stdout": "esptool.py v4.8.1\nSerial port COM7\nConnecting....\nDetecting chip type... ESP32-S3\nChip is ESP32-S3 (QFN56) (revision v0.2)\nFeatures: WiFi, BLE\nCrystal is 40MHz\nMAC: d4:05:92:7b:c8:08\nHard resetting via RTS pin...\n"
+    },
+    {
+      "match": "flash[-_]id",
+      "returncode": 0,
+      "stdout": "esptool.py v4.8.1\nSerial port COM7\nConnecting....\nDetecting chip type... ESP32-S3\nChip is ESP32-S3 (QFN56) (revision v0.2)\nCrystal is 40MHz\nMAC: d4:05:92:7b:c8:08\nManufacturer: 85\nDevice: 4018\nDetected flash size: 16MB\nHard resetting via RTS pin...\n"
+    }
+  ]
+}

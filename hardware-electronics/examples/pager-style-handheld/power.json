@@ -1,0 +1,126 @@
+{
+  "schema": "hardware-electronics/power",
+  "version": "1.0",
+  "project": "pager-style-handheld",
+
+  "battery": {
+    "chemistry": "lipo",
+    "cell_id": "battery",
+    "capacity_mah": 1100,
+    "capacity_provenance": "seller_claimed",
+    "protection": true,
+    "usable_fraction": 0.85,
+    "max_discharge_ma": 2200,
+    "v_nominal": 3.7,
+    "v_min": 3.0,
+    "v_max": 4.2,
+    "enclosure_sealed": false,
+    "vented": true
+  },
+
+  "charge": {
+    "ic": "LGS4056H",
+    "ma": 600,
+    "prog_resistor_ohm": 2000,
+    "prog_constant": 1200,
+    "fixed_in_hardware": true,
+    "provenance": "schematic",
+    "source": "R18 = 2 kOhm / 5% on PROG, schematic rev V0.3.1. R17 = 330 ohm is the LED resistor, not R_PROG.",
+    "min_cell_mah": 600
+  },
+
+  "rails": [
+    { "id": "VBAT", "v": 3.7, "source": "cell", "rating_ma": 2200, "rating_provenance": "seller_claimed" },
+    {
+      "id": "3V3",
+      "v": 3.3,
+      "from": "VBAT",
+      "source": "CE6260B33M LDO on the mainboard",
+      "rating_ma": 600,
+      "rating_provenance": "datasheet"
+    }
+  ],
+
+  "loads": [
+    {
+      "id": "mainboard",
+      "rail": "VBAT",
+      "i_avg_ma": 40.0,
+      "i_peak_ma": 220.0,
+      "provenance": "datasheet",
+      "source": "ESP32-S3 Wi-Fi TX peak plus the panel refresh.",
+      "bulk_uf": 100,
+      "simultaneous_peak": true
+    },
+    {
+      "id": "amp",
+      "rail": "VBAT",
+      "i_avg_ma": 2.4,
+      "i_peak_ma": 1000.0,
+      "provenance": "datasheet",
+      "source": "MAX98357A into a low-impedance load.",
+      "bulk_uf": 100,
+      "simultaneous_peak": true
+    },
+    {
+      "id": "expander",
+      "rail": "3V3",
+      "i_avg_ma": 1.0,
+      "i_peak_ma": 2.0,
+      "provenance": "datasheet"
+    },
+    {
+      "id": "haptic",
+      "rail": "3V3",
+      "i_avg_ma": 0.5,
+      "i_peak_ma": 160.0,
+      "provenance": "datasheet",
+      "source": "Driver plus the coin ERM motor's start current.",
+      "bulk_uf": 10,
+      "inductive": true,
+      "flyback_diode": true,
+      "simultaneous_peak": true
+    },
+    {
+      "id": "mic",
+      "rail": "3V3",
+      "i_avg_ma": 0.6,
+      "i_peak_ma": 1.5,
+      "provenance": "datasheet"
+    }
+  ],
+
+  "states": [
+    {
+      "id": "deep_sleep",
+      "duty": 0.9911,
+      "ma": 0.018,
+      "provenance": "vendor_claim",
+      "source": "Vendor product page and datasheet table.",
+      "conflict": {
+        "values": [0.018, 0.020],
+        "sources": ["datasheet table and product page: 18 uA", "datasheet section 1.2 text: 20 uA"],
+        "note": "The vendor's own documents disagree and nobody has measured it."
+      }
+    },
+    {
+      "id": "wake_wifi_3s",
+      "duty": 0.0069,
+      "ma": 105.0,
+      "provenance": "datasheet",
+      "source": "Three-second Wi-Fi associate, fetch and sleep cycle, four times an hour."
+    },
+    {
+      "id": "ui_active",
+      "duty": 0.002,
+      "ma": 174.0,
+      "provenance": "datasheet",
+      "source": "Screen refresh, keypad and a short alert. Roughly three minutes a day."
+    }
+  ],
+
+  "requirements": {
+    "runtime_target_days": 3,
+    "min_margin_x": 1.5
+  }
+}

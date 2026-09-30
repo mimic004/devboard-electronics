@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hardware-electronics/requirements.schema.json",
+  "title": "Requirements and constraints (phase 1)",
+  "description": "Every value carries a provenance tag. No nulls, no bare prose. A requirement without provenance is a wish.",
+  "type": "object",
+  "required": ["schema", "version", "project"],
+  "$defs": {
+    "provenance": {
+      "enum": ["assumed", "inferred", "seller_claimed", "vendor_claim", "simulated", "datasheet", "schematic", "measured"]
+    },
+    "value": {
+      "type": "object",
+      "required": ["value", "provenance"],
+      "properties": {
+        "value": { "type": ["number", "string", "boolean"] },
+        "unit": { "type": "string" },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "source": { "type": "string" },
+        "verify_before_build": { "type": "boolean", "default": false },
+        "how_to_close": { "type": "string" }
+      }
+    }
+  },
+  "properties": {
+    "schema": { "const": "hardware-electronics/requirements" },
+    "version": { "type": "string" },
+    "project": { "type": "string" },
+
+    "runtime": {
+      "type": "object",
+      "properties": {
+        "target_days": { "$ref": "#/$defs/value" },
+        "duty_description": { "type": "string" },
+        "rechargeable": { "type": "boolean" },
+        "recharge_interval_days": { "$ref": "#/$defs/value" }
+      }
+    },
+
+    "must_fit": {
+      "description": "Every dimensional constraint the build must satisfy. These feed the CAD envelope veto.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "axis", "max_mm", "provenance"],
+        "properties": {
+          "id": { "type": "string" },
+          "axis": { "enum": ["l", "w", "h", "d", "diagonal"] },
+          "max_mm": { "type": "number", "exclusiveMinimum": 0 },
+          "provenance": { "$ref": "#/$defs/provenance" },
+          "source": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+
+    "environment": {
+      "type": "object",
+      "properties": {
+        "indoor": { "type": "boolean" },
+        "temp_min_c": { "$ref": "#/$defs/value" },
+        "temp_max_c": { "$ref": "#/$defs/value" },
+        "humidity": { "type": "string" },
+        "ingress_rating_target": { "type": "string" },
+        "vibration": { "type": "string" },
+        "uv_exposure": { "type": "boolean" }
+      }
+    },
+
+    "connectivity": {
+      "type": "object",
+      "properties": {
+        "wifi": { "type": "boolean" },
+        "ble": { "type": "boolean" },
+        "lora": { "type": "boolean" },
+        "zigbee": { "type": "boolean" },
+        "band_mhz": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+        "region": { "type": "string" },
+        "range_target_m": { "$ref": "#/$defs/value" }
+      }
+    },
+
+    "interactions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind"],
+        "properties": {
+          "id": { "type": "string" },
+          "kind": { "enum": ["button", "wheel", "switch", "display", "led", "haptic", "audio_out", "audio_in", "sensor", "other"] },
+          "count": { "type": "integer", "minimum": 1 },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+
+    "budget": {
+      "type": "object",
+      "properties": {
+        "target_usd": { "type": "number", "minimum": 0 },
+        "hard_cap_usd": { "type": "number", "minimum": 0 }
+      }
+    },
+
+    "non_goals": { "type": "array", "items": { "type": "string" } }
+  }
+}

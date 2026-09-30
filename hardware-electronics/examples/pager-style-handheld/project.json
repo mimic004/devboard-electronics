@@ -1,0 +1,41 @@
+{
+  "schema": "hardware-electronics/project",
+  "version": "1.0",
+  "project": "pager-style-handheld",
+  "created": "2026-09-27",
+  "summary": "A handheld message pager: ESP32-S3 board with a 2.9 inch e-paper panel, a keypad behind an I2C GPIO expander, a speaker, a haptic motor, a piezo and a LiPo cell, in a printed two-part shell. Wi-Fi now, LoRa as a stretch goal.",
+
+  "voltage_class": {
+    "max_v": 5.0,
+    "kind": "dc",
+    "mains_involved": false,
+    "source": "USB VBUS while charging; a single LiPo otherwise."
+  },
+
+  "application": {
+    "description": "A personal message pager. Nothing safety-related depends on it.",
+    "safety_critical": false,
+    "safety_category": "none"
+  },
+
+  "tools": {
+    "multimeter": true,
+    "multimeter_ua_range": true,
+    "calipers": true,
+    "soldering_iron": true,
+    "logic_analyzer": false,
+    "oscilloscope": false,
+    "bench_psu_current_limited": false,
+    "usb_serial_adapter": true,
+    "3d_printer": true
+  },
+
+  "enclosure": {
+    "required": true,
+    "printed": true,
+    "material": "PETG",
+    "cad_skill": "parametric-3d-printing"
+  },
+
+  "skipped": []
+}

@@ -1,0 +1,119 @@
+{
+  "schema": "hardware-electronics/board",
+  "version": "1.0",
+  "id": "rp2040-generic",
+  "display_name": "RP2040 generic (Raspberry Pi Pico class)",
+  "status": "active",
+  "family": "RP2040",
+  "mcu": {
+    "family": "RP2040",
+    "cores": 2,
+    "flash_mb": 2,
+    "flash_mb_provenance": "vendor_claim - 2 MB is the Pico default; other boards differ. Read it off the board.",
+    "psram_mb": null,
+    "psram_note": "The RP2040 has no PSRAM interface. It has 264 KB of on-chip SRAM."
+  },
+  "fqbn": null,
+  "logic_v": 3.3,
+  "gpio_valid": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    26,
+    27,
+    28
+  ],
+  "input_only": [],
+  "strapping": {},
+  "rtc_capable": [],
+  "adc1": {
+    "26": "ADC0",
+    "27": "ADC1",
+    "28": "ADC2"
+  },
+  "adc2": {},
+  "usb": [],
+  "jtag": [],
+  "consumed": {
+    "23": "On the Pico: SMPS power-save control. Not broken out.",
+    "24": "On the Pico: VBUS sense. Not broken out.",
+    "25": "On the Pico: onboard LED.",
+    "29": "On the Pico: VSYS voltage sense via a divider, on ADC3."
+  },
+  "free": null,
+  "conditional_free": {},
+  "contradicted_header_pins": {},
+  "radio": {
+    "wifi": false,
+    "ble": false,
+    "lora": false
+  },
+  "pin_notes": {
+    "26": "ADC0. The RP2040 ADC has a documented differential-nonlinearity quirk; do not expect a clean monotonic ladder from a resistor-ladder keypad without characterising it.",
+    "27": "ADC1",
+    "28": "ADC2"
+  },
+  "notes": [
+    "The RP2040 has no ADC2/Wi-Fi conflict, because it has no radio. On the Pico W the radio is a separate CYW43439 driven over its own pins.",
+    "There is no RTC-capable-pin restriction in the ESP32 sense. Low-power wake works differently; this profile deliberately leaves rtc_capable empty rather than guessing, so the linter will flag any wake source as unverified for this family.",
+    "Any GPIO can be any function via the PIO and the pin mux, which makes conflict checking MORE important, not less: nothing physically stops you double-booking a pin.",
+    "This is a generic profile. Confirm the specific board's broken-out pin set before allocating."
+  ],
+  "sources": [
+    "Raspberry Pi RP2040 datasheet and Pico datasheet (general knowledge)"
+  ],
+  "corroboration": {
+    "sources": [
+      {
+        "id": "rp_ds",
+        "kind": "datasheet",
+        "ref": "Raspberry Pi RP2040 datasheet and Raspberry Pi Pico datasheet: GPIO count, ADC channels GPIO26-28, Pico-specific GPIO23/24/25/29 usage"
+      }
+    ],
+    "groups": {
+      "gpio_map": {
+        "sources": [
+          "rp_ds"
+        ],
+        "agreement": "full",
+        "note": "Pico-shaped. Other RP2040 boards expose different subsets."
+      },
+      "adc": {
+        "sources": [
+          "rp_ds"
+        ],
+        "agreement": "full"
+      }
+    },
+    "conservative": true,
+    "conservative_rationale": "Deliberately incomplete rather than wrong. rtc_capable is left EMPTY instead of guessing, so pinmap_lint reports any wake source on this family as unverified rather than blessing it. Pico-specific pins 23/24/25/29 are marked consumed even though other RP2040 boards route them differently.",
+    "contradictions": [],
+    "open_questions": [
+      {
+        "question": "Low-power wake behaviour for this family has not been characterised, which is why rtc_capable is empty.",
+        "impact": "Any deep-sleep wake design on RP2040 is flagged as unverified by pinmap_lint.",
+        "blocks_active": false
+      }
+    ]
+  }
+}

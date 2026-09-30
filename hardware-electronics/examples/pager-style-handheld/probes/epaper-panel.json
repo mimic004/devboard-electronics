@@ -1,0 +1,38 @@
+{
+  "peripheral": "epaper_panel",
+  "board": "heltec_vision_master_e290",
+  "command": "PROBE busy 6 18 active_high 5000",
+
+  "preconditions": [
+    {
+      "gpio": 18,
+      "level": "high",
+      "settle_ms": 100,
+      "note": "GPIO18 is Vext and gates the e-ink 3V3 rail, active HIGH. With it low the panel controller is unpowered, BUSY floats, and every refresh appears to succeed. Assert it and let it settle BEFORE the sequence."
+    }
+  ],
+
+  "expect": { "result": "ok" },
+
+  "plausibility": {
+    "busy_ms": {
+      "min": 300,
+      "max": 3000,
+      "why": "A full e-paper refresh cannot physically complete in tens of milliseconds - the particles take hundreds of milliseconds to move. An implausibly fast success means the panel power-enable line is low and the controller is unpowered, so BUSY floats and every refresh appears to succeed. Treat a fast success as a FAULT. Do not widen this band."
+    },
+    "assert_ms": {
+      "min": 0,
+      "max": 500,
+      "why": "The controller should raise BUSY promptly once triggered. A long delay before it asserts means it is still booting, or the trigger is not reaching it."
+    }
+  },
+
+  "requires_transition": {
+    "measurement": "busy_ms",
+    "must_change": true,
+    "why": "E-ink retains its last image with no power. A static demo picture survives a dead driver, a wiped flash and an unpowered board, so seeing an image on the panel proves nothing. Only a change you watched happen counts as evidence - here, a BUSY line that asserted and then released."
+  },
+
+  "timeout_s": 30,
+  "retry_allowed": false
+}

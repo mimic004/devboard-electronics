@@ -1,0 +1,104 @@
+{
+  "schema": "hardware-electronics/part",
+  "version": "1.0",
+  "id": "sph0645lm4h-adafruit3421",
+  "description": "SPH0645LM4H I2S MEMS microphone breakout",
+  "vendor": "Adafruit",
+  "sku": "3421",
+  "mpn": "SPH0645LM4H-B",
+  "class": "microphone",
+  "footprint": {
+    "shape": "rect",
+    "l": 18.0,
+    "w": 15.0,
+    "h": 3.0,
+    "height_includes": "body_only",
+    "provenance": {
+      "l": "vendor_claim",
+      "w": "vendor_claim",
+      "h": "assumed"
+    }
+  },
+  "logic_v": 3.3,
+  "level_tolerant_5v": false,
+  "electrical": {
+    "rail": "3V3",
+    "v_min": 1.6,
+    "v_max": 3.6,
+    "i_avg_ma": 0.6,
+    "i_peak_ma": 1.5,
+    "provenance": "datasheet"
+  },
+  "bus": {
+    "kind": "i2s",
+    "signals": [
+      "BCLK",
+      "WS",
+      "SD"
+    ],
+    "pins_consumed": 3
+  },
+  "orientation_constraint": {
+    "locked": true,
+    "kind": "port_axis",
+    "feature": "acoustic_port",
+    "reason": "This is a BOTTOM-PORT MEMS microphone: the sound hole is on the underside of the package, through the PCB. The port must face the enclosure's mic opening, and there must be a sealed path from the port to the outside. A mic pointing into the case interior hears the enclosure, not the room."
+  },
+  "keepouts": [
+    {
+      "id": "acoustic_path",
+      "kind": "acoustic",
+      "shape": "cylinder",
+      "d": 4.0,
+      "h": 2.0,
+      "ref": "port_face",
+      "reason": "The port needs an unobstructed, gasketed channel to the exterior opening. Do not print a solid face across it."
+    }
+  ],
+  "failure_mode": "degraded",
+  "traps": [
+    "An unsealed microphone hears everything inside the case: the vibration motor, the speaker back-wave, and every button click transmitted through the plastic. Separation distance alone is not a substitute for a gasket.",
+    "Bottom-port means the mechanical design and the electrical design are coupled. Getting the orientation wrong is not a wiring error you can fix in firmware."
+  ],
+  "notes": [
+    "Keep it at least 40 mm from a speaker and at least 10 mm from a vibration motor where the enclosure permits, and gasket the port regardless.",
+    "Bring it up alone, never simultaneously with an I2S amplifier on the same bus."
+  ],
+  "sources": [
+    "Knowles SPH0645LM4H datasheet (bottom port, voltage range)",
+    "reference project A, docs/pager-hardware-plan.md (mic-to-speaker and mic-to-motor separation assertions)"
+  ],
+  "corroboration": {
+    "sources": [
+      {
+        "id": "knowles",
+        "kind": "datasheet",
+        "ref": "Knowles SPH0645LM4H datasheet: bottom-port construction, supply range"
+      },
+      {
+        "id": "ref_project_a",
+        "kind": "community_firmware",
+        "ref": "reference project A docs/pager-hardware-plan.md: mic-to-speaker and mic-to-motor separation assertions"
+      }
+    ],
+    "groups": {
+      "electrical": {
+        "sources": [
+          "knowles"
+        ],
+        "agreement": "full"
+      },
+      "footprint": {
+        "sources": [
+          "knowles"
+        ],
+        "agreement": "full",
+        "note": "Breakout dimensions are vendor_claim; height is tagged assumed."
+      }
+    },
+    "conservative": false,
+    "contradictions": [],
+    "open_questions": []
+  },
+  "status": "active"
+}

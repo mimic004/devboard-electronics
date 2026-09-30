@@ -1,0 +1,37 @@
+flowchart LR
+  mainboard["mainboard<br/>3.3 V"]
+  amp["amp<br/>3.3 V"]
+  mic["mic<br/>3.3 V"]
+  haptic["haptic<br/>I2C 0x5A<br/>3.3 V"]
+  expander["expander<br/>I2C 0x20<br/>3.3 V"]
+  speaker["speaker"]
+  motor["motor"]
+  piezo["piezo"]
+  battery["battery"]
+  battery --- |"gnd: --GND"| mainboard
+  mainboard --- |"gnd: GND-GND"| amp
+  amp --- |"gnd: GND-GND"| mic
+  mic --- |"gnd: GND-GND"| haptic
+  haptic --- |"gnd: GND-GND"| expander
+  expander --- |"gnd: GND-2"| piezo
+  battery --- |"vbat: +-VBAT"| mainboard
+  mainboard --- |"vbat: VBAT-VIN"| amp
+  mainboard --- |"v3v3: 3V3-3V3"| mic
+  mic --- |"v3v3: 3V3-VIN"| haptic
+  haptic --- |"v3v3: VIN-VCC"| expander
+  mainboard --- |"i2c_sda: 39-SDA"| expander
+  expander --- |"i2c_sda: SDA-SDA"| haptic
+  mainboard --- |"i2c_scl: 38-SCL"| expander
+  expander --- |"i2c_scl: SCL-SCL"| haptic
+  mainboard --- |"exp_int: 21-INTA"| expander
+  mainboard --- |"mic_bclk: 41-BCLK"| mic
+  mainboard --- |"mic_ws: 42-WS"| mic
+  mainboard --- |"mic_sd: 40-SD"| mic
+  mainboard --- |"amp_bclk: 47-BCLK"| amp
+  mainboard --- |"amp_lrc: 48-LRC"| amp
+  mainboard --- |"amp_din: 17-DIN"| amp
+  amp --- |"spk_p: OUT+-1"| speaker
+  amp --- |"spk_n: OUT--2"| speaker
+  haptic --- |"motor_p: OUT+-1"| motor
+  haptic --- |"motor_n: OUT--2"| motor
+  expander --- |"piezo_drive: GPB0-1"| piezo

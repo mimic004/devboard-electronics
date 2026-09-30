@@ -1,0 +1,31 @@
+# Per-skill virtualenvs
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Working files produced by the tools, not part of the skills
+hardware-profiles/drafts/
+*.bak
+*.tmp.json
+
+# Project artefacts a user generates while following an example.
+# The examples' own checked-in outputs are tracked deliberately:
+# examples/pager-style-handheld/wiring.{md,dot,mmd} are committed so the
+# connection-table format is visible without running anything.
+factory.bin
+*.stl
+*.3mf
+*.step
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

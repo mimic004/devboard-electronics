@@ -1,0 +1,187 @@
+{
+  "schema": "hardware-electronics/board",
+  "version": "1.0",
+  "id": "esp32-classic",
+  "display_name": "ESP32 (original, WROOM-32 style module)",
+  "status": "active",
+  "family": "ESP32",
+  "mcu": {
+    "family": "ESP32",
+    "cores": 2,
+    "flash_mb": null,
+    "flash_mb_provenance": "unknown - read it off silicon",
+    "psram_mb": null
+  },
+  "fqbn": null,
+  "logic_v": 3.3,
+  "gpio_valid": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    21,
+    22,
+    23,
+    25,
+    26,
+    27,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39
+  ],
+  "input_only": [
+    34,
+    35,
+    36,
+    37,
+    38,
+    39
+  ],
+  "strapping": {
+    "0": "Boot mode select. Usually the BOOT button.",
+    "2": "Must be low or floating at boot for download mode.",
+    "5": "SDIO timing. Has an internal pull-up at boot.",
+    "12": "MTDI selects VDD_SDIO voltage. An external pull-up at boot can set 1.8 V flash and prevent boot.",
+    "15": "MTDO controls boot log output. Internally pulled up."
+  },
+  "rtc_capable": [
+    0,
+    2,
+    4,
+    12,
+    13,
+    14,
+    15,
+    25,
+    26,
+    27,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39
+  ],
+  "adc1": {
+    "32": "ADC1_CH4",
+    "33": "ADC1_CH5",
+    "34": "ADC1_CH6",
+    "35": "ADC1_CH7",
+    "36": "ADC1_CH0",
+    "37": "ADC1_CH1",
+    "38": "ADC1_CH2",
+    "39": "ADC1_CH3"
+  },
+  "adc2": {
+    "0": "ADC2_CH1",
+    "2": "ADC2_CH2",
+    "4": "ADC2_CH0",
+    "12": "ADC2_CH5",
+    "13": "ADC2_CH4",
+    "14": "ADC2_CH6",
+    "15": "ADC2_CH3",
+    "25": "ADC2_CH8",
+    "26": "ADC2_CH9",
+    "27": "ADC2_CH7"
+  },
+  "usb": [],
+  "jtag": [
+    12,
+    13,
+    14,
+    15
+  ],
+  "consumed": {
+    "6": "SPI flash (SD_CLK) - not broken out",
+    "7": "SPI flash (SD_DATA0) - not broken out",
+    "8": "SPI flash (SD_DATA1) - not broken out",
+    "9": "SPI flash (SD_DATA2) - not broken out on most modules",
+    "10": "SPI flash (SD_DATA3) - not broken out on most modules",
+    "11": "SPI flash (SD_CMD) - not broken out"
+  },
+  "free": null,
+  "conditional_free": {
+    "1": "UART0 TX. Free only if you give up the serial console.",
+    "3": "UART0 RX. Free only if you give up the serial console.",
+    "16": "Consumed by PSRAM on WROVER modules.",
+    "17": "Consumed by PSRAM on WROVER modules."
+  },
+  "contradicted_header_pins": {},
+  "radio": {
+    "wifi": true,
+    "ble": true,
+    "lora": false
+  },
+  "pin_notes": {
+    "34": "Input only. No output driver, and NO internal pull-up or pull-down - fit an external resistor.",
+    "35": "Input only. No internal pulls.",
+    "36": "Input only (SENSOR_VP). No internal pulls.",
+    "39": "Input only (SENSOR_VN). No internal pulls."
+  },
+  "notes": [
+    "GPIO34-39 are input-only AND have no internal pull resistors. A button on one of these needs an external pull-up.",
+    "ADC2 is unusable while Wi-Fi is active, exactly as on the S3. On the classic part this is worse, because ADC2 covers most of the convenient pins.",
+    "GPIO12 (MTDI) is the classic brick: an external pull-up at boot can select 1.8 V flash.",
+    "GPIO6-11 are the flash bus and are not broken out on standard modules."
+  ],
+  "sources": [
+    "Espressif ESP32 datasheet and technical reference manual (general knowledge)"
+  ],
+  "corroboration": {
+    "sources": [
+      {
+        "id": "espressif_ds",
+        "kind": "datasheet",
+        "ref": "Espressif ESP32 datasheet and Technical Reference Manual: input-only GPIO34-39, ADC bank map, strapping pins, flash bus GPIO6-11"
+      }
+    ],
+    "groups": {
+      "gpio_map": {
+        "sources": [
+          "espressif_ds"
+        ],
+        "agreement": "full",
+        "note": "Family-level only."
+      },
+      "strapping": {
+        "sources": [
+          "espressif_ds"
+        ],
+        "agreement": "full"
+      },
+      "adc": {
+        "sources": [
+          "espressif_ds"
+        ],
+        "agreement": "full"
+      },
+      "rtc_wake": {
+        "sources": [
+          "espressif_ds"
+        ],
+        "agreement": "full"
+      }
+    },
+    "conservative": true,
+    "conservative_rationale": "A family fallback that over-reserves: the flash bus GPIO6-11 is marked consumed unconditionally, and GPIO16/17 are only conditionally free because WROVER modules use them for PSRAM. Refusing a pin that a bare WROOM would have allowed is the safe direction.",
+    "contradictions": [],
+    "open_questions": []
+  }
+}

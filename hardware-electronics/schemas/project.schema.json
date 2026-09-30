@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hardware-electronics/project.schema.json",
+  "title": "Project intake and safety triage (phase 0)",
+  "type": "object",
+  "required": ["schema", "version", "project", "voltage_class", "application", "tools"],
+  "properties": {
+    "schema": { "const": "hardware-electronics/project" },
+    "version": { "type": "string" },
+    "project": { "type": "string", "minLength": 1 },
+    "created": { "type": "string" },
+    "summary": { "type": "string" },
+
+    "voltage_class": {
+      "description": "Highest voltage anywhere in the build. The skill refuses above 50 V AC or 120 V DC.",
+      "type": "object",
+      "required": ["max_v", "kind"],
+      "properties": {
+        "max_v": { "type": "number", "minimum": 0 },
+        "kind": { "enum": ["dc", "ac"] },
+        "mains_involved": { "type": "boolean", "default": false },
+        "source": { "type": "string" }
+      }
+    },
+
+    "application": {
+      "type": "object",
+      "required": ["description", "safety_critical"],
+      "properties": {
+        "description": { "type": "string" },
+        "safety_critical": {
+          "description": "true for medical/dosing, primary smoke-CO-gas alarm, automotive control, aviation, firearms, lifting or load-bearing. A reminder is not safety-critical; a dispenser is.",
+          "type": "boolean"
+        },
+        "safety_category": {
+          "enum": ["none", "medical", "life_safety_alarm", "automotive", "aviation", "firearms", "load_bearing", "other"]
+        },
+        "certified_primary_exists": {
+          "description": "Only meaningful when safety_critical is true. The skill may assist with a REDUNDANT SECONDARY indicator when the user states a certified primary exists.",
+          "type": "boolean"
+        },
+        "redundant_secondary_only": { "type": "boolean" }
+      }
+    },
+
+    "tools": {
+      "description": "The user's bench inventory. This decides which downstream gates are reachable at all. Without a multimeter, every measured-provenance gate is unreachable and the agent must say so now, not at phase 9.",
+      "type": "object",
+      "required": ["multimeter"],
+      "properties": {
+        "multimeter": { "type": "boolean" },
+        "multimeter_ua_range": { "type": "boolean" },
+        "calipers": { "type": "boolean" },
+        "soldering_iron": { "type": "boolean" },
+        "logic_analyzer": { "type": "boolean" },
+        "oscilloscope": { "type": "boolean" },
+        "bench_psu_current_limited": { "type": "boolean" },
+        "usb_serial_adapter": { "type": "boolean" },
+        "3d_printer": { "type": "boolean" }
+      }
+    },
+
+    "enclosure": {
+      "type": "object",
+      "properties": {
+        "required": { "type": "boolean" },
+        "printed": { "type": "boolean" },
+        "material": { "type": "string" },
+        "cad_skill": { "type": "string", "default": "parametric-3d-printing" }
+      }
+    },
+
+    "skipped": {
+      "description": "Phases are skippable ONLY by recording them here, never silently.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["phase", "reason"],
+        "properties": {
+          "phase": { "type": "integer", "minimum": 0, "maximum": 9 },
+          "reason": { "type": "string", "minLength": 10 }
+        }
+      }
+    }
+  }
+}

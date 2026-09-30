@@ -1,0 +1,26 @@
+{
+  "peripheral": "i2c_bus",
+  "board": "heltec_vision_master_e290",
+  "command": "PROBE i2c 39 38 100000",
+
+  "expect": {
+    "result": "ok",
+    "i2c_addresses": ["0x20", "0x5a"]
+  },
+
+  "plausibility": {
+    "count": {
+      "min": 2,
+      "max": 2,
+      "why": "The expected set is EXACT. A third device means an address strap is wrong or something is on the bus that should not be; zero or one means a missing pull-up, the wrong pins, or an unpowered module."
+    },
+    "elapsed_ms": {
+      "min": 5,
+      "max": 2000,
+      "why": "A 112-address scan at 100 kHz takes tens of milliseconds. A scan that returns in under 5 ms did not actually walk the bus; one that takes seconds is stretching or clock-stretching on every address."
+    }
+  },
+
+  "timeout_s": 20,
+  "retry_allowed": false
+}

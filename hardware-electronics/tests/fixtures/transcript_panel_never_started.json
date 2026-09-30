@@ -1,0 +1,35 @@
+{
+  "schema": "hardware-electronics/serial-transcript",
+  "version": "1.0",
+  "port": "COM7",
+  "recorded": "2026-09-24T19:22:00-06:00",
+  "note": "Vext asserted but the panel FPC was not seated. BUSY never asserts, so the probe reports never-started instead of a fast success. This is the failure the assert-before-release rule converts a silent lie into.",
+  "banner": ["probe.ready 1.0"],
+  "exchanges": [
+    {
+      "tx": "PROBE rail 18 high",
+      "rx": [
+        "probe.rail.pin 18",
+        "probe.rail.before low",
+        "probe.rail.after high",
+        "probe.rail.changed yes",
+        "probe.rail.settle_ms 100",
+        "probe.done rail ok"
+      ]
+    },
+    {
+      "tx": "PROBE busy 6 18 active_high 5000",
+      "rx": [
+        "probe.busy.busy_pin 6",
+        "probe.busy.trigger_pin 18",
+        "probe.busy.sense active_high",
+        "probe.busy.timeout_ms 5000",
+        "probe.busy.asserted no",
+        "probe.busy.assert_ms 5000",
+        "probe.busy.diagnosis busy-never-asserted-peripheral-probably-unpowered",
+        "probe.busy.error never-started",
+        "probe.done busy fail"
+      ]
+    }
+  ]
+}

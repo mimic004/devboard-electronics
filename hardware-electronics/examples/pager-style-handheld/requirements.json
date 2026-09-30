@@ -1,0 +1,84 @@
+{
+  "schema": "hardware-electronics/requirements",
+  "version": "1.0",
+  "project": "pager-style-handheld",
+
+  "runtime": {
+    "target_days": {
+      "value": 3,
+      "unit": "days",
+      "provenance": "assumed",
+      "source": "User statement: 'it should survive a long weekend'.",
+      "verify_before_build": false
+    },
+    "duty_description": "Deep sleep almost all the time. A few short Wi-Fi wakes an hour, plus a couple of minutes of active screen and keypad use a day.",
+    "rechargeable": true
+  },
+
+  "must_fit": [
+    {
+      "id": "pocket_length",
+      "axis": "l",
+      "max_mm": 115.0,
+      "provenance": "measured",
+      "source": "Calipers across a jacket pocket opening, 2026-09-18.",
+      "reason": "It has to go in a pocket or it will not get carried."
+    },
+    {
+      "id": "pocket_width",
+      "axis": "w",
+      "max_mm": 80.0,
+      "provenance": "measured",
+      "source": "Calipers, same pocket."
+    },
+    {
+      "id": "one_hand_thickness",
+      "axis": "h",
+      "max_mm": 22.0,
+      "provenance": "assumed",
+      "source": "Comparison against a phone that is comfortable to hold.",
+      "reason": "Above this it stops being a one-handed device."
+    }
+  ],
+
+  "environment": {
+    "indoor": true,
+    "temp_min_c": { "value": 0, "unit": "C", "provenance": "assumed", "source": "Carried outdoors in winter but not left out." },
+    "temp_max_c": { "value": 40, "unit": "C", "provenance": "assumed", "source": "Left in a warm room, not a car." },
+    "humidity": "Non-condensing.",
+    "ingress_rating_target": "none",
+    "uv_exposure": false
+  },
+
+  "connectivity": {
+    "wifi": true,
+    "ble": false,
+    "lora": true,
+    "zigbee": false,
+    "band_mhz": [902, 928],
+    "region": "US915",
+    "range_target_m": {
+      "value": 100,
+      "unit": "m",
+      "provenance": "assumed",
+      "source": "Wi-Fi coverage in the building.",
+      "how_to_close": "Range-test in place, inside the closed shell."
+    }
+  },
+
+  "interactions": [
+    { "id": "keypad", "kind": "button", "count": 8, "notes": "Behind an I2C expander, because there is no free ADC1 channel for a resistor ladder." },
+    { "id": "panel", "kind": "display", "count": 1, "notes": "2.9 inch e-paper. Retains its image with no power, which is exactly why a static demo image proves nothing." },
+    { "id": "speaker", "kind": "audio_out", "count": 1 },
+    { "id": "haptic", "kind": "haptic", "count": 1 },
+    { "id": "piezo", "kind": "audio_out", "count": 1, "notes": "A loud alert tone independent of the amplifier rail." }
+  ],
+
+  "budget": { "target_usd": 90.0, "hard_cap_usd": 140.0 },
+
+  "non_goals": [
+    "No PCB. This is modules and dev boards joined by wire.",
+    "No cellular. Wi-Fi and possibly LoRa only.",
+    "No voice recognition on-device."
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "hardware-electronics/serial-transcript",
+  "version": "1.0",
+  "port": "COM7",
+  "recorded": "2026-09-16T22:40:00-06:00",
+  "note": "THE 29 MS CASE. Captured with the panel power-enable line low. Nothing errored. The refresh 'succeeded' in 29 ms, BUSY was floating the whole time, and the controller was never powered. This is what a validator that only asks 'did it return without error' happily passes.",
+  "banner": ["probe.ready 1.0"],
+  "exchanges": [
+    {
+      "tx": "PROBE rail 18 high",
+      "rx": [
+        "probe.rail.pin 18",
+        "probe.rail.before low",
+        "probe.rail.after low",
+        "probe.rail.changed no",
+        "probe.rail.settle_ms 100",
+        "probe.done rail ok"
+      ]
+    },
+    {
+      "tx": "PROBE busy 6 18 active_high 5000",
+      "rx": [
+        "probe.busy.busy_pin 6",
+        "probe.busy.trigger_pin 18",
+        "probe.busy.sense active_high",
+        "probe.busy.timeout_ms 5000",
+        "probe.busy.asserted yes",
+        "probe.busy.assert_ms 1",
+        "probe.busy.released yes",
+        "probe.busy.busy_ms 29",
+        "probe.busy.elapsed_ms 30",
+        "probe.done busy ok"
+      ]
+    }
+  ]
+}

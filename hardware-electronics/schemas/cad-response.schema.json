@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hardware-electronics/cad-response.schema.json",
+  "title": "CAD response - the reverse channel",
+  "description": "Written by the parametric-3d-printing skill after consuming a component manifest. The dependency runs both ways: a CAD-side search over real footprints can discover that a part in the BOM cannot physically fit, and that finding must get back to the BOM.",
+  "type": "object",
+  "required": ["schema", "version", "responds_to", "status"],
+  "properties": {
+    "schema": { "const": "hardware-electronics/cad-response" },
+    "version": { "type": "string" },
+    "responds_to": {
+      "description": "content_hash of the manifest this answers. A response against a stale hash is not an answer.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "generated": { "type": "string" },
+    "status": { "enum": ["accepted", "accepted_with_constraints", "rejected"] },
+
+    "realised": {
+      "description": "What the CAD side actually built. Electronics reads this to check its own separations and channel minima.",
+      "type": "object",
+      "properties": {
+        "envelope": { "type": "object" },
+        "placements": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "x": { "type": "number" },
+              "y": { "type": "number" },
+              "z": { "type": "number" },
+              "rotation_z": { "type": "number" }
+            }
+          }
+        },
+        "channels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": { "w": { "type": "number" }, "h": { "type": "number" } }
+          }
+        },
+        "clearances": { "type": "object", "additionalProperties": { "type": "number" } }
+      }
+    },
+
+    "assertions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "result"],
+        "properties": {
+          "id": { "type": "string" },
+          "result": { "enum": ["pass", "fail", "not_evaluated"] },
+          "value": { "type": ["number", "string", "null"] },
+          "note": { "type": "string" }
+        }
+      }
+    },
+
+    "counter_constraints": {
+      "description": "CAD pushing back on an electronics-owned number. Unacknowledged counter-constraints fail handoff_lint.py --check-response. Acknowledging means editing the BOM and regenerating the manifest, which changes the hash.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["component", "field", "reason"],
+        "properties": {
+          "component": { "type": "string" },
+          "field": { "type": "string" },
+          "was": { "type": ["number", "string", "null"] },
+          "max_possible": { "type": ["number", "string", "null"] },
+          "required": { "type": ["number", "string", "null"] },
+          "reason": { "type": "string", "minLength": 10 },
+          "action_required": { "type": "string" },
+          "acknowledged": { "type": "boolean", "default": false },
+          "acknowledged_in_hash": { "type": "string" }
+        }
+      }
+    },
+
+    "artifacts": {
+      "type": "object",
+      "properties": {
+        "stls": { "type": "array", "items": { "type": "string" } },
+        "previews": { "type": "array", "items": { "type": "string" } },
+        "scripts": { "type": "array", "items": { "type": "string" } },
+        "watertight": { "type": "boolean" }
+      }
+    }
+  }
+}

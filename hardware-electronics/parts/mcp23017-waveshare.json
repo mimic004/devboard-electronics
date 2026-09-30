@@ -1,0 +1,124 @@
+{
+  "schema": "hardware-electronics/part",
+  "version": "1.0",
+  "id": "mcp23017-waveshare",
+  "description": "MCP23017 16-channel I2C GPIO expander breakout (Waveshare style)",
+  "vendor": "Waveshare",
+  "class": "expander",
+  "footprint": {
+    "shape": "rect",
+    "l": 38.0,
+    "w": 23.0,
+    "h": 13.0,
+    "height_includes": "over_connector",
+    "provenance": {
+      "l": "vendor_claim",
+      "w": "vendor_claim",
+      "h": "assumed"
+    }
+  },
+  "logic_v": 3.3,
+  "level_tolerant_5v": true,
+  "electrical": {
+    "rail": "3V3",
+    "v_min": 1.8,
+    "v_max": 5.5,
+    "i_avg_ma": 1.0,
+    "i_peak_ma": 2.0,
+    "provenance": "datasheet"
+  },
+  "i2c": {
+    "addresses": [
+      "0x20",
+      "0x21",
+      "0x22",
+      "0x23",
+      "0x24",
+      "0x25",
+      "0x26",
+      "0x27"
+    ],
+    "default": "0x20",
+    "address_select": "A0/A1/A2 strap pins select one of eight addresses. Two expanders on one bus is fine; two at 0x20 is not.",
+    "onboard_pullup_ohm": 10000
+  },
+  "pins_provided": 16,
+  "interrupt": {
+    "pins": [
+      "INTA",
+      "INTB"
+    ],
+    "mirrorable": true,
+    "note": "The interrupt output must land on an RTC-capable pin if it has to wake the MCU from deep sleep. On ESP32-S3 that means GPIO0-21."
+  },
+  "keepouts": [
+    {
+      "id": "connector_edge",
+      "kind": "access",
+      "shape": "rect",
+      "l": 38.0,
+      "w": 6.0,
+      "h": 13.0,
+      "reason": "Screw terminals or headers occupy one long edge and need wire entry room."
+    }
+  ],
+  "failure_mode": "loud",
+  "traps": [
+    "This part is the standard escape hatch when a board has no free ADC1 channel and a resistor-ladder keypad is therefore impossible. It is also 38 x 23 mm, which is large: adopting it grew one reference enclosure from 105 x 72 mm to 110 x 76 mm. One pin decision moved the enclosure by 5 mm on two axes.",
+    "It carries onboard 10k I2C pull-ups. Stack three such modules on one bus and the effective pull-up drops to about 3.3k, which can be too stiff at 3.3 V. Count the pull-ups already fitted before adding your own."
+  ],
+  "notes": [
+    "Use it for buttons, LEDs and any slow digital I/O. Do not put a bus-timed signal behind it.",
+    "Choosing the expander is an ARCHITECTURAL fix for PIN_BUDGET_EXHAUSTED, not a patch. It changes the BOM, the power budget and the enclosure."
+  ],
+  "sources": [
+    "Microchip MCP23017 datasheet (address range, voltage range)",
+    "reference project A, docs/pager-hardware-plan.md (the resistor-ladder keypad is dead; ADC1 is GPIO1-10 and every one is consumed)",
+    "reference project A, docs/bom.md (38 x 23 mm, and the resulting enclosure growth)"
+  ],
+  "corroboration": {
+    "sources": [
+      {
+        "id": "microchip",
+        "kind": "datasheet",
+        "ref": "Microchip MCP23017 datasheet: address range 0x20-0x27, supply range, interrupt behaviour"
+      },
+      {
+        "id": "ref_project_a",
+        "kind": "community_firmware",
+        "ref": "reference project A docs/bom.md and docs/pager-hardware-plan.md: 38 x 23 mm module footprint and the resulting enclosure growth"
+      }
+    ],
+    "groups": {
+      "addressing": {
+        "sources": [
+          "microchip"
+        ],
+        "agreement": "full"
+      },
+      "electrical": {
+        "sources": [
+          "microchip"
+        ],
+        "agreement": "full"
+      },
+      "footprint": {
+        "sources": [
+          "ref_project_a"
+        ],
+        "agreement": "full",
+        "note": "Module outline, not the IC. Height is over fitted terminals and is tagged assumed in the profile."
+      }
+    },
+    "conservative": false,
+    "contradictions": [],
+    "open_questions": [
+      {
+        "question": "Module height is tagged assumed. Measure with calipers before designing a pocket around it.",
+        "impact": "Enclosure interior depth.",
+        "blocks_active": false
+      }
+    ]
+  },
+  "status": "active"
+}

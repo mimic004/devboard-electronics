@@ -1,0 +1,85 @@
+{
+  "schema": "hardware-electronics/netlist",
+  "version": "1.0",
+  "project": "fixture-broken-harness",
+
+  "components": [
+    {
+      "ref": "mcu",
+      "kind": "mcu",
+      "is_ic": true,
+      "logic_v": 3.3,
+      "pins": [
+        { "pin": "GND" },
+        { "pin": "3V3" },
+        { "pin": 4, "name": "sensor enable" },
+        { "pin": 5, "name": "left dangling on purpose" }
+      ]
+    },
+    {
+      "ref": "driver",
+      "kind": "ic",
+      "is_ic": true,
+      "pins": [
+        { "pin": "VIN" },
+        { "pin": "GND" },
+        { "pin": "IN" },
+        { "pin": "OUT" }
+      ]
+    },
+    {
+      "ref": "motor",
+      "kind": "other",
+      "pins": [{ "pin": 1 }, { "pin": 2 }]
+    },
+    {
+      "ref": "battery",
+      "kind": "battery",
+      "pins": [{ "pin": "+" }, { "pin": "-" }]
+    }
+  ],
+
+  "nets": [
+    {
+      "id": "gnd",
+      "kind": "ground",
+      "endpoints": [
+        { "ref": "mcu", "pin": "GND" },
+        { "ref": "battery", "pin": "-" }
+      ]
+    },
+    {
+      "id": "vbat",
+      "kind": "power",
+      "v": 3.7,
+      "i_peak_ma": 2500,
+      "awg": 30,
+      "endpoints": [
+        { "ref": "battery", "pin": "+" },
+        { "ref": "mcu", "pin": "3V3" },
+        { "ref": "driver", "pin": "VIN" }
+      ]
+    },
+    {
+      "id": "enable",
+      "kind": "signal",
+      "endpoints": [
+        { "ref": "mcu", "pin": 4 },
+        { "ref": "driver", "pin": "IN" }
+      ]
+    },
+    {
+      "id": "orphan",
+      "kind": "signal",
+      "endpoints": [{ "ref": "driver", "pin": "OUT" }]
+    },
+    {
+      "id": "ghost",
+      "kind": "signal",
+      "endpoints": [
+        { "ref": "mcu", "pin": 4 },
+        { "ref": "nonexistent", "pin": 1 }
+      ]
+    }
+  ]
+}

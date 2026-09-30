@@ -1,0 +1,227 @@
+{
+  "schema": "hardware-electronics/board",
+  "version": "1.0",
+  "id": "esp32s3-generic",
+  "display_name": "ESP32-S3 generic module (quad SPI flash + quad PSRAM)",
+  "status": "active",
+  "family": "ESP32-S3",
+  "mcu": {
+    "family": "ESP32-S3",
+    "cores": 2,
+    "flash_mb": null,
+    "flash_mb_provenance": "unknown - read it off silicon, do not guess from the module label",
+    "psram_mb": null,
+    "psram_note": "A PSRAM size of 0 at runtime usually means BOARD_HAS_PSRAM was never defined by the board definition, so the core never initialised SPIRAM. That is an expected reading, not a fault."
+  },
+  "fqbn": null,
+  "fqbn_note": "Prefer the vendor board definition and change nothing. Substituting the generic 'ESP32S3 Dev Module' and setting the options by hand is how people end up with OPI PSRAM and 16 MB flash selected on a board that has neither.",
+  "logic_v": 3.3,
+  "gpio_valid": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48
+  ],
+  "input_only": [],
+  "strapping": {
+    "0": "Boot mode select. Held low at reset enters download mode. Usually the BOOT button.",
+    "3": "JTAG source select. Floating at boot is the normal state.",
+    "45": "Selects VDD_SPI voltage at boot. An external pull-up switches flash to 1.8 V and bricks boot. The most dangerous pin on the part.",
+    "46": "Boot mode / ROM message printing. Internally pulled down; do not fit an external pull-up."
+  },
+  "rtc_capable": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+  ],
+  "adc1": {
+    "1": "ADC1_CH0",
+    "2": "ADC1_CH1",
+    "3": "ADC1_CH2",
+    "4": "ADC1_CH3",
+    "5": "ADC1_CH4",
+    "6": "ADC1_CH5",
+    "7": "ADC1_CH6",
+    "8": "ADC1_CH7",
+    "9": "ADC1_CH8",
+    "10": "ADC1_CH9"
+  },
+  "adc2": {
+    "11": "ADC2_CH0",
+    "12": "ADC2_CH1",
+    "13": "ADC2_CH2",
+    "14": "ADC2_CH3",
+    "15": "ADC2_CH4",
+    "16": "ADC2_CH5",
+    "17": "ADC2_CH6",
+    "18": "ADC2_CH7",
+    "19": "ADC2_CH8",
+    "20": "ADC2_CH9"
+  },
+  "usb": [
+    19,
+    20
+  ],
+  "jtag": [
+    39,
+    40,
+    41,
+    42
+  ],
+  "consumed": {
+    "26": "SPI flash (SPICS1)",
+    "27": "SPI flash (SPIHD)",
+    "28": "SPI flash (SPIWP)",
+    "29": "SPI flash (SPICS0)",
+    "30": "SPI flash (SPICLK)",
+    "31": "SPI flash (SPIQ)",
+    "32": "SPI flash (SPID)",
+    "33": "Octal flash / quad PSRAM. Consumed on modules that fit PSRAM.",
+    "34": "Octal flash / quad PSRAM. Consumed on modules that fit PSRAM.",
+    "35": "Octal flash / quad PSRAM. Consumed on modules that fit PSRAM.",
+    "36": "Octal flash / quad PSRAM. Consumed on modules that fit PSRAM.",
+    "37": "Octal flash / quad PSRAM. Consumed on modules that fit PSRAM."
+  },
+  "free": null,
+  "conditional_free": {
+    "19": "USB D- . Free only if you do not use native USB and do not need USB-CDC console.",
+    "20": "USB D+ . Free only if you do not use native USB and do not need USB-CDC console.",
+    "43": "UART0 TX. Free only with a USB-CDC console.",
+    "44": "UART0 RX. Free only with a USB-CDC console."
+  },
+  "contradicted_header_pins": {},
+  "radio": {
+    "wifi": true,
+    "ble": true,
+    "lora": false
+  },
+  "pin_notes": {
+    "0": "BOOT button on most boards. Usable as an input after boot, but never fit an external pull-down.",
+    "45": "Do not fit any external pull on this pin.",
+    "46": "Input-capable but strapping. Treat as read-only after boot."
+  },
+  "notes": [
+    "The ESP32-S3 has NO input-only GPIOs. Rules written for the classic ESP32's GPIO34-39 do not apply here.",
+    "ADC2 is unusable while the Wi-Fi driver is active: adc2_get_raw() returns ESP_ERR_TIMEOUT. If a design needs an analog input and Wi-Fi, it needs a free ADC1 channel or an I2C ADC.",
+    "Only GPIO0-21 are RTC-capable, so a deep-sleep wake source cannot live on GPIO44.",
+    "Using GPIO40/41/42 costs hardware JTAG debugging. That is a real cost, not an error.",
+    "This is the generic fallback profile. It is deliberately pessimistic about flash and PSRAM. Read both off silicon before believing anything."
+  ],
+  "sources": [
+    "Espressif ESP32-S3 datasheet and technical reference manual (general knowledge)",
+    "reference project A, docs/pager-hardware-plan.md and docs/e290-hardware-reference.md for the ADC2/Wi-Fi and RTC-pin consequences"
+  ],
+  "corroboration": {
+    "sources": [
+      {
+        "id": "espressif_ds",
+        "kind": "datasheet",
+        "ref": "Espressif ESP32-S3 datasheet and Technical Reference Manual: GPIO matrix, strapping pins, ADC bank map, RTC domain"
+      },
+      {
+        "id": "ref_project_a",
+        "kind": "community_firmware",
+        "ref": "reference project A project notes (docs/pager-hardware-plan.md, docs/e290-hardware-reference.md) for the ADC2-with-Wi-Fi and RTC-pin consequences as encountered in practice"
+      }
+    ],
+    "groups": {
+      "gpio_map": {
+        "sources": [
+          "espressif_ds"
+        ],
+        "agreement": "full",
+        "note": "Family-level only. This profile describes the PART, not any particular board, and marks flash and PSRAM pins consumed on the assumption that a module fits both."
+      },
+      "strapping": {
+        "sources": [
+          "espressif_ds"
+        ],
+        "agreement": "full"
+      },
+      "adc": {
+        "sources": [
+          "espressif_ds",
+          "ref_project_a"
+        ],
+        "agreement": "full"
+      },
+      "rtc_wake": {
+        "sources": [
+          "espressif_ds",
+          "ref_project_a"
+        ],
+        "agreement": "full"
+      }
+    },
+    "conservative": true,
+    "conservative_rationale": "This is a family fallback, not a board. It over-reserves: flash pins 26-32 and PSRAM pins 33-37 are marked consumed even though a module without PSRAM would free five of them, and nothing is ever listed in the authoritative free list. The failure mode is refusing a pin that would have worked, which is recoverable; the opposite would hand a designer a pin that breaks the flash bus.",
+    "contradictions": [],
+    "open_questions": [
+      {
+        "question": "Flash and PSRAM size are deliberately null. Read them off silicon per board.",
+        "impact": "Partition layout.",
+        "blocks_active": false
+      }
+    ]
+  }
+}

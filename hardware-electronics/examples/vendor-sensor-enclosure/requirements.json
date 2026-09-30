@@ -1,0 +1,72 @@
+{
+  "schema": "hardware-electronics/requirements",
+  "version": "1.0",
+  "project": "vendor-sensor-enclosure",
+
+  "must_fit": [
+    {
+      "id": "shelf_width",
+      "axis": "w",
+      "max_mm": 95.0,
+      "provenance": "measured",
+      "source": "Calipers across the bathroom shelf, 2026-09-25.",
+      "reason": "If it does not fit the shelf it will live somewhere else, and a reminder you cannot see is not a reminder."
+    },
+    {
+      "id": "shelf_depth",
+      "axis": "l",
+      "max_mm": 150.0,
+      "provenance": "measured",
+      "source": "Calipers, same shelf."
+    },
+    {
+      "id": "lid_clearance_height",
+      "axis": "h",
+      "max_mm": 70.0,
+      "provenance": "measured",
+      "source": "Shelf to the underside of the cupboard above, measured with the lid's swing in mind."
+    }
+  ],
+
+  "environment": {
+    "indoor": true,
+    "temp_min_c": { "value": 15, "unit": "C", "provenance": "assumed", "source": "Heated bathroom." },
+    "temp_max_c": { "value": 35, "unit": "C", "provenance": "assumed", "source": "Steam from a shower, not direct heat." },
+    "humidity": "Intermittently high. Nothing here is moisture-sensitive, but the sensor's vents must not be blocked.",
+    "ingress_rating_target": "none",
+    "uv_exposure": false
+  },
+
+  "connectivity": {
+    "wifi": false,
+    "ble": false,
+    "lora": false,
+    "zigbee": true,
+    "band_mhz": [2400, 2500],
+    "region": "worldwide 2.4 GHz ISM",
+    "range_target_m": {
+      "value": 8,
+      "unit": "m",
+      "provenance": "assumed",
+      "source": "Distance from the bathroom shelf to the nearest Zigbee router.",
+      "how_to_close": "Range-test in place: sensor inside the closed printed box, on the actual shelf, through the actual walls. Not on the desk next to the coordinator."
+    }
+  },
+
+  "interactions": [
+    {
+      "id": "lid",
+      "kind": "switch",
+      "count": 1,
+      "notes": "The lid IS the interaction. Opening it is the only input the system has."
+    }
+  ],
+
+  "budget": { "target_usd": 25.0, "hard_cap_usd": 40.0 },
+
+  "non_goals": [
+    "It does not dispense, count or withhold medication. It watches a lid.",
+    "No display and no on-device alerting. The nagging happens on a phone.",
+    "No firmware of any kind. Adding an MCU here would add a battery to charge, a rail to budget and a bring-up to do, in exchange for nothing the vendor sensor does not already provide."
+  ]
+}

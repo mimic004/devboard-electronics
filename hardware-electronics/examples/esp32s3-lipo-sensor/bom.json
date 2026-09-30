@@ -1,0 +1,145 @@
+{
+  "schema": "hardware-electronics/bom",
+  "version": "1.0",
+  "project": "esp32s3-lipo-sensor",
+  "generated": "2026-09-27",
+
+  "rows": [
+    {
+      "id": "mcu_board",
+      "description": "ESP32-S3 development board, quad SPI flash, USB-C",
+      "qty": 1,
+      "mpn": null,
+      "supplier_url": null,
+      "unit_cost_usd": 12.0,
+      "footprint": {
+        "shape": "rect",
+        "l": 52.0,
+        "w": 25.4,
+        "h": 12.0,
+        "height_includes": "over_connector",
+        "provenance": { "l": "measured", "w": "measured", "h": "measured" },
+        "verify_before": "none"
+      },
+      "connector": {
+        "type": "JST-PH",
+        "pitch_mm": 2.0,
+        "pins": 2,
+        "gender": "socket",
+        "net": "battery",
+        "mates_with": "battery",
+        "polarity_verified": true
+      },
+      "electrical": {
+        "rail": "VBAT",
+        "v_min": 3.0,
+        "v_max": 5.5,
+        "logic_v": 3.3,
+        "i_avg_ma": 40.0,
+        "i_peak_ma": 240.0
+      },
+      "rf": {
+        "band_mhz": [2400, 2500],
+        "transmits": true,
+        "antenna": "pcb_trace"
+      },
+      "failure_mode": "loud",
+      "notes": "Use the vendor board definition and change nothing. Flash size was read off silicon rather than believed from the label - see measurements.jsonl."
+    },
+
+    {
+      "id": "battery",
+      "description": "Protected LiPo pouch cell, 2000 mAh, JST-PH 2.0 lead",
+      "qty": 1,
+      "unit_cost_usd": 11.5,
+      "footprint": {
+        "shape": "rect",
+        "l": 60.0,
+        "w": 35.0,
+        "h": 7.0,
+        "height_includes": "body_only",
+        "provenance": { "l": "seller_claimed", "w": "seller_claimed", "h": "seller_claimed" },
+        "verify_before": "assembly"
+      },
+      "connector": {
+        "type": "JST-PH",
+        "pitch_mm": 2.0,
+        "pins": 2,
+        "gender": "plug",
+        "net": "battery",
+        "mates_with": "mcu_board",
+        "polarity_verified": true
+      },
+      "electrical": {
+        "rail": "VBAT",
+        "capacity_mah": 2000,
+        "v_min": 3.0,
+        "v_max": 4.2
+      },
+      "failure_mode": "degraded",
+      "notes": "Protected cell with an integrated PCM. Polarity was metered before the first connection; the reading is in the ledger. Cell capacity clears the charger's minimum - see power.json."
+    },
+
+    {
+      "id": "sensor",
+      "description": "BME280 temperature / humidity / pressure breakout, I2C",
+      "qty": 1,
+      "unit_cost_usd": 6.0,
+      "footprint": {
+        "shape": "rect",
+        "l": 15.0,
+        "w": 11.5,
+        "h": 3.0,
+        "height_includes": "body_only",
+        "provenance": { "l": "vendor_claim", "w": "vendor_claim", "h": "vendor_claim" },
+        "verify_before": "none"
+      },
+      "connector": {
+        "type": "DuPont",
+        "pitch_mm": 2.54,
+        "pins": 4,
+        "gender": "header",
+        "net": "i2c0",
+        "mates_with": null
+      },
+      "electrical": {
+        "rail": "3V3",
+        "v_min": 1.7,
+        "v_max": 3.6,
+        "logic_v": 3.3,
+        "i_avg_ma": 0.004,
+        "i_peak_ma": 0.7
+      },
+      "failure_mode": "degraded",
+      "notes": "Strapped to 0x76. The alternative address 0x77 is free, which leaves room for a second sensor later without a bus change."
+    },
+
+    {
+      "id": "status_led",
+      "description": "3 mm LED plus 1k series resistor",
+      "qty": 1,
+      "unit_cost_usd": 0.3,
+      "electrical": { "rail": "3V3", "i_avg_ma": 0.0, "i_peak_ma": 2.0 },
+      "failure_mode": "loud",
+      "notes": "Driven only while awake. It contributes nothing to the sleep current, which is where the runtime actually lives."
+    },
+
+    {
+      "id": "wake_button",
+      "description": "6 mm tactile switch, through-hole",
+      "qty": 1,
+      "unit_cost_usd": 0.2,
+      "footprint": {
+        "shape": "rect",
+        "l": 6.0,
+        "w": 6.0,
+        "h": 4.3,
+        "height_includes": "to_plunger_top",
+        "provenance": { "l": "datasheet", "w": "datasheet", "h": "datasheet" },
+        "verify_before": "none"
+      },
+      "failure_mode": "loud",
+      "notes": "Active low against the internal pull-up, so no external resistor is needed. Height is stated to the top of the plunger, not the body - the third figure in a W x L x H tactile switch spec usually is, and mistaking it is how a set of keys ends up permanently held."
+    }
+  ]
+}

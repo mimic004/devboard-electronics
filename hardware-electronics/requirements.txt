@@ -1,0 +1,33 @@
+# Python 3.12. Not 3.13+: this skill does not itself need OpenCASCADE, but it
+# must not create a venv the paired parametric-3d-printing skill cannot use, and
+# there are no OCC wheels above 3.12.
+#
+# Bump these deliberately, not casually. Every gate in this skill is a version
+# of "the number is wrong and nothing crashed", which is exactly the failure a
+# silent dependency upgrade produces.
+
+jsonschema>=4.21,<5      # every gate is schema-first
+pyserial>=3.5,<4         # board_cli.py, probe_client.py
+esptool>=4.8,<5          # chip and flash identity, factory backup
+pytest>=8.0,<9           # tests/
+
+# Deliberately NOT dependencies:
+#
+#   cadquery / trimesh / pyrender
+#       This skill never builds geometry. It emits a manifest; the CAD skill
+#       consumes it. Keeping the dependency out is what lets this skill install
+#       and run on a machine with a broken OpenCASCADE - and it is why
+#       cad_bridge/ can work around that skill's exit-code trap without
+#       inheriting its version pins.
+#
+#   numpy / pandas
+#       The arithmetic is sums and divisions.
+#
+#   graphviz (the python binding)
+#       wiring_render.py shells out to the `dot` binary when it is present and
+#       falls back to Mermaid text when it is not. Neither is required.
+#
+#   arduino-cli
+#       An external binary, not a pip package. board_cli.py looks for it at
+#       %LOCALAPPDATA%\arduino-cli\arduino-cli.exe or on PATH and returns a
+#       structured TOOL_MISSING finding rather than throwing.

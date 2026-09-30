@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hardware-electronics/netlist.schema.json",
+  "title": "Netlist for the wiring artefact (phase 5)",
+  "description": "A connection graph, not a schematic. Consumed by wiring_render.py, which is not part of the M0-M5 core build; the schema ships now so phase 5 data has a shape.",
+  "type": "object",
+  "required": ["schema", "version", "components", "nets"],
+  "properties": {
+    "schema": { "const": "hardware-electronics/netlist" },
+    "version": { "type": "string" },
+    "project": { "type": "string" },
+    "accepted_findings": {
+      "description": "Advisory findings accepted on purpose, each with a written reason. Only advisory codes may be accepted; NET_DANGLING, PIN_UNCONNECTED, NO_DECOUPLING, NO_COMMON_GROUND and WIRE_GAUGE_UNDERSIZED cannot be.",
+      "type": "object",
+      "additionalProperties": { "type": "string", "minLength": 10 }
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ref", "pins"],
+        "properties": {
+          "ref": { "type": "string" },
+          "kind": { "enum": ["mcu", "module", "ic", "passive", "connector", "transducer", "battery", "switch", "other"] },
+          "is_ic": { "type": "boolean" },
+          "decoupling_uf": { "type": ["number", "null"] },
+          "logic_v": { "type": "number" },
+          "i2c_addr": { "type": "string" },
+          "pins": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["pin"],
+              "properties": {
+                "pin": { "type": ["string", "integer"] },
+                "name": { "type": "string" },
+                "nc": { "type": "boolean", "default": false }
+              }
+            }
+          }
+        }
+      }
+    },
+    "nets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "endpoints"],
+        "properties": {
+          "id": { "type": "string" },
+          "kind": { "enum": ["power", "ground", "signal", "analog", "rf"] },
+          "v": { "type": "number" },
+          "i_peak_ma": { "type": "number" },
+          "awg": { "type": "integer" },
+          "colour": { "type": "string" },
+          "endpoints": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["ref", "pin"],
+              "properties": {
+                "ref": { "type": "string" },
+                "pin": { "type": ["string", "integer"] }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hardware-electronics/power.schema.json",
+  "title": "Power budget (phase 3)",
+  "description": "Rails balance, charge rate is sane, runtime beats target with a stated margin, and every large transient has bulk capacitance. Output is always source=simulated.",
+  "type": "object",
+  "required": ["schema", "version", "project", "rails", "loads", "states"],
+  "$defs": {
+    "provenance": {
+      "enum": ["assumed", "inferred", "seller_claimed", "vendor_claim", "simulated", "datasheet", "schematic", "measured"]
+    }
+  },
+  "properties": {
+    "schema": { "const": "hardware-electronics/power" },
+    "version": { "type": "string" },
+    "project": { "type": "string" },
+
+    "battery": {
+      "type": "object",
+      "required": ["chemistry", "capacity_mah"],
+      "properties": {
+        "chemistry": { "enum": ["lipo", "liion", "lifepo4", "nimh", "alkaline", "coin_lithium", "none"] },
+        "cell_id": { "type": "string" },
+        "capacity_mah": { "type": "number", "exclusiveMinimum": 0 },
+        "capacity_provenance": { "$ref": "#/$defs/provenance" },
+        "protection": {
+          "description": "An integrated protection circuit. Charging an unprotected lithium cell is a refusal unless an external protection IC is in the BOM.",
+          "type": "boolean"
+        },
+        "external_protection_ic": { "type": ["string", "null"] },
+        "usable_fraction": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "default": 0.85 },
+        "max_discharge_ma": { "type": "number", "exclusiveMinimum": 0 },
+        "v_nominal": { "type": "number" },
+        "v_min": { "type": "number" },
+        "v_max": { "type": "number" },
+        "enclosure_sealed": { "type": "boolean" },
+        "vented": { "type": "boolean" }
+      }
+    },
+
+    "charge": {
+      "type": "object",
+      "properties": {
+        "ic": { "type": "string" },
+        "ma": { "type": "number", "exclusiveMinimum": 0 },
+        "prog_resistor_ohm": { "type": "number" },
+        "prog_constant": { "type": "number" },
+        "fixed_in_hardware": {
+          "description": "True when the charge current is set by a fitted resistor. Then the MINIMUM CELL CAPACITY becomes a BOM constraint, not a preference.",
+          "type": "boolean"
+        },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "source": { "type": "string" }
+      }
+    },
+
+    "rails": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "rating_ma"],
+        "properties": {
+          "id": { "type": "string" },
+          "v": { "type": "number" },
+          "source": { "type": "string" },
+          "from": { "type": "string" },
+          "rating_ma": { "type": "number", "exclusiveMinimum": 0 },
+          "rating_provenance": { "$ref": "#/$defs/provenance" },
+          "gated": { "type": "boolean" },
+          "load_switch": { "type": ["string", "null"] }
+        }
+      }
+    },
+
+    "loads": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "rail", "i_avg_ma"],
+        "properties": {
+          "id": { "type": "string" },
+          "rail": { "type": "string" },
+          "i_avg_ma": { "type": "number", "minimum": 0 },
+          "i_peak_ma": { "type": "number", "minimum": 0 },
+          "provenance": { "$ref": "#/$defs/provenance" },
+          "source": { "type": "string" },
+          "bulk_uf": { "type": ["number", "null"], "minimum": 0 },
+          "simultaneous_peak": {
+            "description": "Can this load peak at the same time as the others? Used for the brownout check.",
+            "type": "boolean",
+            "default": true
+          },
+          "inductive": { "type": "boolean" },
+          "flyback_diode": { "type": "boolean" }
+        }
+      }
+    },
+
+    "states": {
+      "description": "Duty-cycle states. Duties must sum to 1.0. Either give ma directly, or list loads_active and let the tool sum them.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "duty"],
+        "properties": {
+          "id": { "type": "string" },
+          "duty": { "type": "number", "minimum": 0, "maximum": 1 },
+          "ma": { "type": "number", "minimum": 0 },
+          "loads_active": { "type": "array", "items": { "type": "string" } },
+          "provenance": { "$ref": "#/$defs/provenance" },
+          "source": { "type": "string" },
+          "conflict": {
+            "description": "Two sources disagree and neither is measured. The tool then reports a runtime RANGE, not a point estimate.",
+            "type": "object",
+            "required": ["values"],
+            "properties": {
+              "values": { "type": "array", "items": { "type": "number" }, "minItems": 2 },
+              "sources": { "type": "array", "items": { "type": "string" } },
+              "note": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+
+    "requirements": {
+      "type": "object",
+      "properties": {
+        "runtime_target_days": { "type": "number", "exclusiveMinimum": 0 },
+        "min_margin_x": { "type": "number", "minimum": 1, "default": 1.5 }
+      }
+    },
+
+    "accepted_findings": {
+      "description": "Advisory findings accepted on purpose, each with a written reason. SLEEP_UNMEASURED and AVERAGE_UNMEASURED cannot be accepted: you may proceed on an unmeasured estimate, but you may not silence the caveat that says so.",
+      "type": "object",
+      "additionalProperties": { "type": "string", "minLength": 10 }
+    }
+  }
+}

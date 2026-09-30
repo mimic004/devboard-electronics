@@ -1,0 +1,102 @@
+{
+  "schema": "hardware-electronics/power",
+  "version": "1.0",
+  "project": "esp32s3-lipo-sensor",
+
+  "battery": {
+    "chemistry": "lipo",
+    "cell_id": "battery",
+    "capacity_mah": 2000,
+    "capacity_provenance": "seller_claimed",
+    "protection": true,
+    "usable_fraction": 0.85,
+    "max_discharge_ma": 4000,
+    "v_nominal": 3.7,
+    "v_min": 3.0,
+    "v_max": 4.2,
+    "enclosure_sealed": false,
+    "vented": true
+  },
+
+  "charge": {
+    "ic": "TP4056",
+    "ma": 1000,
+    "prog_resistor_ohm": 1200,
+    "prog_constant": 1200,
+    "fixed_in_hardware": true,
+    "provenance": "measured",
+    "source": "R_PROG metered at 1.19 kOhm on the physical board, 2026-09-22. See measurements.jsonl.",
+    "min_cell_mah": 1000
+  },
+
+  "rails": [
+    {
+      "id": "VBAT",
+      "v": 3.7,
+      "source": "cell",
+      "rating_ma": 4000,
+      "rating_provenance": "seller_claimed"
+    },
+    {
+      "id": "3V3",
+      "v": 3.3,
+      "from": "VBAT",
+      "source": "MCP1700-3302E LDO on the dev board",
+      "rating_ma": 250,
+      "rating_provenance": "datasheet"
+    }
+  ],
+
+  "loads": [
+    {
+      "id": "mcu",
+      "rail": "3V3",
+      "i_avg_ma": 40.0,
+      "i_peak_ma": 240.0,
+      "provenance": "datasheet",
+      "source": "ESP32-S3 datasheet, Wi-Fi TX peak.",
+      "bulk_uf": 100,
+      "simultaneous_peak": true
+    },
+    {
+      "id": "sensor",
+      "rail": "3V3",
+      "i_avg_ma": 0.004,
+      "i_peak_ma": 0.7,
+      "provenance": "datasheet",
+      "bulk_uf": 0.1,
+      "simultaneous_peak": true
+    },
+    {
+      "id": "status_led",
+      "rail": "3V3",
+      "i_avg_ma": 0.0,
+      "i_peak_ma": 2.0,
+      "provenance": "inferred",
+      "source": "3.3 V across a 1k series resistor less the LED forward drop.",
+      "simultaneous_peak": true
+    }
+  ],
+
+  "states": [
+    {
+      "id": "deep_sleep",
+      "duty": 0.99,
+      "ma": 0.012,
+      "provenance": "measured",
+      "source": "Metered in series with the battery positive lead, uA range, USB disconnected, 2026-09-24. See measurements.jsonl."
+    },
+    {
+      "id": "wake_read_publish",
+      "duty": 0.01,
+      "ma": 95.0,
+      "provenance": "measured",
+      "source": "Mean of a 9 s wake cycle measured on a current-sense shunt, 2026-09-24."
+    }
+  ],
+
+  "requirements": {
+    "runtime_target_days": 30,
+    "min_margin_x": 1.5
+  }
+}

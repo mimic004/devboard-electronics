@@ -1,0 +1,133 @@
+{
+  "schema": "hardware-electronics/bom",
+  "version": "1.0",
+  "project": "fixture-five-traps",
+  "generated": "2026-09-27",
+
+  "enclosure": {
+    "printed": true,
+    "material": "carbon-filled PETG",
+    "material_filled": "carbon_filled"
+  },
+
+  "rows": [
+    {
+      "id": "mainboard",
+      "description": "ESP32-S3 board with an SX1262 LoRa radio and a 1.25 mm battery socket",
+      "qty": 1,
+      "variant": {
+        "axis": "lora_frequency_band",
+        "locked_at_order": true,
+        "options": ["433 MHz", "470-510 MHz", "863-870 MHz", "902-928 MHz"]
+      },
+      "footprint": {
+        "shape": "rect",
+        "l": 87.96,
+        "w": 36.63,
+        "h": 1.6,
+        "provenance": { "l": "datasheet", "w": "datasheet", "h": "datasheet" },
+        "verify_before": "print"
+      },
+      "connector": {
+        "type": "SH1.25",
+        "pitch_mm": 1.25,
+        "pins": 2,
+        "gender": "socket",
+        "net": "battery",
+        "mates_with": "battery",
+        "polarity_verified": false
+      },
+      "electrical": { "rail": "VBAT", "logic_v": 3.3 },
+      "rf": { "band_mhz": [902, 928], "transmits": true, "antenna": "ufl" },
+      "drives_cad": { "parameters": ["board_l"], "owner_script": "case.py" },
+      "failure_mode": "loud"
+    },
+
+    {
+      "id": "battery",
+      "description": "LiPo cell, 500 mAh, JST-PH 2.0 lead",
+      "qty": 1,
+      "footprint": {
+        "shape": "rect",
+        "l": 40.0,
+        "w": 25.0,
+        "h": 6.0,
+        "provenance": { "l": "seller_claimed", "w": "seller_claimed", "h": "seller_claimed" },
+        "verify_before": "none"
+      },
+      "connector": {
+        "type": "JST-PH",
+        "pitch_mm": 2.0,
+        "pins": 2,
+        "gender": "plug",
+        "net": "battery",
+        "mates_with": "mainboard",
+        "polarity_verified": false
+      },
+      "electrical": { "rail": "VBAT", "capacity_mah": 500 },
+      "drives_cad": { "parameters": ["batt_l"], "owner_script": "case.py" },
+      "failure_mode": "degraded"
+    },
+
+    {
+      "id": "speaker",
+      "description": "Mini metal speaker",
+      "qty": 1,
+      "footprint": {
+        "shape": "circle",
+        "d": 28.0,
+        "h": 8.0,
+        "provenance": { "d": "seller_claimed", "h": "seller_claimed" }
+      },
+      "connector": { "type": "solder_pad", "gender": "solder_pad" },
+      "drives_cad": { "parameters": ["spk_d"], "owner_script": "case.py" },
+      "failure_mode": "loud"
+    },
+
+    {
+      "id": "piezo",
+      "description": "Piezo disc, somewhere between 20 and 27 mm",
+      "qty": 1,
+      "variant": { "axis": "diameter", "locked_at_order": true, "options": ["20mm", "23mm", "27mm"] },
+      "footprint": {
+        "shape": "circle",
+        "d": 27.0,
+        "h": 2.5,
+        "provenance": { "d": "assumed", "h": "assumed" }
+      },
+      "drives_cad": { "parameters": ["piezo_d"], "owner_script": "case.py" },
+      "failure_mode": "loud"
+    },
+
+    {
+      "id": "tactile_switches",
+      "description": "6 mm tactile switches, 3.8 mm tall",
+      "qty": 8,
+      "footprint": {
+        "shape": "rect",
+        "l": 6.0,
+        "w": 6.0,
+        "h": 3.8,
+        "provenance": { "l": "seller_claimed", "w": "seller_claimed", "h": "seller_claimed" }
+      },
+      "drives_cad": { "parameters": ["sw_h"], "owner_script": "case.py" },
+      "failure_mode": "loud"
+    },
+
+    {
+      "id": "zigbee_sensor",
+      "description": "Vendor Zigbee contact sensor on its own coin cell",
+      "qty": 1,
+      "footprint": {
+        "shape": "rect",
+        "l": 41.0,
+        "w": 22.0,
+        "h": 11.0,
+        "height_includes": "body_only",
+        "provenance": { "l": "measured", "w": "measured", "h": "measured" },
+        "verify_before": "none"
+      },
+      "failure_mode": "silent"
+    }
+  ]
+}

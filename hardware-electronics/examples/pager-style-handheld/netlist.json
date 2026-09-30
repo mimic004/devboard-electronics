@@ -1,0 +1,281 @@
+{
+  "schema": "hardware-electronics/netlist",
+  "version": "1.0",
+  "project": "pager-style-handheld",
+
+  "accepted_findings": {
+    "GRAPHVIZ_MISSING": "Graphviz is not installed on this machine, so the renderer falls back to Mermaid. The connection table is the artefact that actually gets used at the bench and it is unaffected; the diagram gets looked at once."
+  },
+
+  "components": [
+    {
+      "ref": "mainboard",
+      "kind": "mcu",
+      "is_ic": true,
+      "decoupling_uf": 10,
+      "logic_v": 3.3,
+      "pins": [
+        { "pin": "GND", "name": "ground" },
+        { "pin": "VBAT", "name": "cell positive" },
+        { "pin": "3V3", "name": "regulated 3.3 V out" },
+        { "pin": 17, "name": "amp DIN" },
+        { "pin": 21, "name": "expander INT / USER button" },
+        { "pin": 38, "name": "QuickLink SCL" },
+        { "pin": 39, "name": "QuickLink SDA" },
+        { "pin": 40, "name": "mic SD (JTAG MTDO)" },
+        { "pin": 41, "name": "mic BCLK (JTAG MTDI)" },
+        { "pin": 42, "name": "mic WS (JTAG MTMS)" },
+        { "pin": 47, "name": "amp BCLK" },
+        { "pin": 48, "name": "amp LRC" }
+      ]
+    },
+    {
+      "ref": "amp",
+      "kind": "ic",
+      "is_ic": true,
+      "decoupling_uf": 100,
+      "logic_v": 3.3,
+      "pins": [
+        { "pin": "VIN" },
+        { "pin": "GND" },
+        { "pin": "BCLK" },
+        { "pin": "LRC" },
+        { "pin": "DIN" },
+        { "pin": "OUT+" },
+        { "pin": "OUT-" },
+        { "pin": "SD", "name": "shutdown, tied high on the module", "nc": true },
+        { "pin": "GAIN", "name": "left at the 9 dB default", "nc": true }
+      ]
+    },
+    {
+      "ref": "mic",
+      "kind": "ic",
+      "is_ic": true,
+      "decoupling_uf": 0.1,
+      "logic_v": 3.3,
+      "pins": [
+        { "pin": "3V3" },
+        { "pin": "GND" },
+        { "pin": "BCLK" },
+        { "pin": "WS" },
+        { "pin": "SD" },
+        { "pin": "SEL", "name": "channel select, left low", "nc": true }
+      ]
+    },
+    {
+      "ref": "haptic",
+      "kind": "ic",
+      "is_ic": true,
+      "decoupling_uf": 10,
+      "logic_v": 3.3,
+      "i2c_addr": "0x5A",
+      "pins": [
+        { "pin": "VIN" },
+        { "pin": "GND" },
+        { "pin": "SDA" },
+        { "pin": "SCL" },
+        { "pin": "OUT+" },
+        { "pin": "OUT-" },
+        { "pin": "IN", "name": "analog PWM input, unused", "nc": true },
+        { "pin": "EN", "name": "pulled high on the module", "nc": true }
+      ]
+    },
+    {
+      "ref": "expander",
+      "kind": "ic",
+      "is_ic": true,
+      "decoupling_uf": 0.1,
+      "logic_v": 3.3,
+      "i2c_addr": "0x20",
+      "pins": [
+        { "pin": "VCC" },
+        { "pin": "GND" },
+        { "pin": "SDA" },
+        { "pin": "SCL" },
+        { "pin": "INTA" },
+        { "pin": "GPB0", "name": "piezo drive" },
+        { "pin": "INTB", "name": "not mirrored", "nc": true },
+        { "pin": "RESET", "name": "pulled high on the module", "nc": true }
+      ]
+    },
+    {
+      "ref": "speaker",
+      "kind": "transducer",
+      "pins": [{ "pin": 1 }, { "pin": 2 }]
+    },
+    {
+      "ref": "motor",
+      "kind": "other",
+      "pins": [{ "pin": 1 }, { "pin": 2 }]
+    },
+    {
+      "ref": "piezo",
+      "kind": "transducer",
+      "pins": [{ "pin": 1 }, { "pin": 2 }]
+    },
+    {
+      "ref": "battery",
+      "kind": "battery",
+      "pins": [{ "pin": "+" }, { "pin": "-" }]
+    }
+  ],
+
+  "nets": [
+    {
+      "id": "gnd",
+      "kind": "ground",
+      "colour": "black",
+      "awg": 26,
+      "endpoints": [
+        { "ref": "battery", "pin": "-" },
+        { "ref": "mainboard", "pin": "GND" },
+        { "ref": "amp", "pin": "GND" },
+        { "ref": "mic", "pin": "GND" },
+        { "ref": "haptic", "pin": "GND" },
+        { "ref": "expander", "pin": "GND" },
+        { "ref": "piezo", "pin": 2 }
+      ]
+    },
+    {
+      "id": "vbat",
+      "kind": "power",
+      "v": 3.7,
+      "i_peak_ma": 1220,
+      "colour": "red",
+      "awg": 26,
+      "endpoints": [
+        { "ref": "battery", "pin": "+" },
+        { "ref": "mainboard", "pin": "VBAT" },
+        { "ref": "amp", "pin": "VIN" }
+      ]
+    },
+    {
+      "id": "v3v3",
+      "kind": "power",
+      "v": 3.3,
+      "i_peak_ma": 165,
+      "colour": "orange",
+      "awg": 28,
+      "endpoints": [
+        { "ref": "mainboard", "pin": "3V3" },
+        { "ref": "mic", "pin": "3V3" },
+        { "ref": "haptic", "pin": "VIN" },
+        { "ref": "expander", "pin": "VCC" }
+      ]
+    },
+    {
+      "id": "i2c_sda",
+      "kind": "signal",
+      "colour": "blue",
+      "awg": 30,
+      "endpoints": [
+        { "ref": "mainboard", "pin": 39 },
+        { "ref": "expander", "pin": "SDA" },
+        { "ref": "haptic", "pin": "SDA" }
+      ]
+    },
+    {
+      "id": "i2c_scl",
+      "kind": "signal",
+      "colour": "white",
+      "awg": 30,
+      "endpoints": [
+        { "ref": "mainboard", "pin": 38 },
+        { "ref": "expander", "pin": "SCL" },
+        { "ref": "haptic", "pin": "SCL" }
+      ]
+    },
+    {
+      "id": "exp_int",
+      "kind": "signal",
+      "colour": "green",
+      "awg": 30,
+      "endpoints": [
+        { "ref": "mainboard", "pin": 21 },
+        { "ref": "expander", "pin": "INTA" }
+      ]
+    },
+    {
+      "id": "mic_bclk",
+      "kind": "signal",
+      "colour": "grey",
+      "awg": 30,
+      "endpoints": [{ "ref": "mainboard", "pin": 41 }, { "ref": "mic", "pin": "BCLK" }]
+    },
+    {
+      "id": "mic_ws",
+      "kind": "signal",
+      "colour": "violet",
+      "awg": 30,
+      "endpoints": [{ "ref": "mainboard", "pin": 42 }, { "ref": "mic", "pin": "WS" }]
+    },
+    {
+      "id": "mic_sd",
+      "kind": "signal",
+      "colour": "brown",
+      "awg": 30,
+      "endpoints": [{ "ref": "mainboard", "pin": 40 }, { "ref": "mic", "pin": "SD" }]
+    },
+    {
+      "id": "amp_bclk",
+      "kind": "signal",
+      "colour": "grey",
+      "awg": 30,
+      "endpoints": [{ "ref": "mainboard", "pin": 47 }, { "ref": "amp", "pin": "BCLK" }]
+    },
+    {
+      "id": "amp_lrc",
+      "kind": "signal",
+      "colour": "violet",
+      "awg": 30,
+      "endpoints": [{ "ref": "mainboard", "pin": 48 }, { "ref": "amp", "pin": "LRC" }]
+    },
+    {
+      "id": "amp_din",
+      "kind": "signal",
+      "colour": "brown",
+      "awg": 30,
+      "endpoints": [{ "ref": "mainboard", "pin": 17 }, { "ref": "amp", "pin": "DIN" }]
+    },
+    {
+      "id": "spk_p",
+      "kind": "signal",
+      "i_peak_ma": 700,
+      "colour": "red",
+      "awg": 30,
+      "endpoints": [{ "ref": "amp", "pin": "OUT+" }, { "ref": "speaker", "pin": 1 }]
+    },
+    {
+      "id": "spk_n",
+      "kind": "signal",
+      "i_peak_ma": 700,
+      "colour": "black",
+      "awg": 30,
+      "endpoints": [{ "ref": "amp", "pin": "OUT-" }, { "ref": "speaker", "pin": 2 }]
+    },
+    {
+      "id": "motor_p",
+      "kind": "signal",
+      "i_peak_ma": 156,
+      "colour": "red",
+      "awg": 28,
+      "endpoints": [{ "ref": "haptic", "pin": "OUT+" }, { "ref": "motor", "pin": 1 }]
+    },
+    {
+      "id": "motor_n",
+      "kind": "signal",
+      "i_peak_ma": 156,
+      "colour": "black",
+      "awg": 28,
+      "endpoints": [{ "ref": "haptic", "pin": "OUT-" }, { "ref": "motor", "pin": 2 }]
+    },
+    {
+      "id": "piezo_drive",
+      "kind": "signal",
+      "i_peak_ma": 12,
+      "colour": "yellow",
+      "awg": 30,
+      "endpoints": [{ "ref": "expander", "pin": "GPB0" }, { "ref": "piezo", "pin": 1 }]
+    }
+  ]
+}

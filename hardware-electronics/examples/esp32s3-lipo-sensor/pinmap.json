@@ -1,0 +1,53 @@
+{
+  "schema": "hardware-electronics/pinmap",
+  "version": "1.0",
+  "project": "esp32s3-lipo-sensor",
+  "board": "esp32s3-generic",
+
+  "radio": { "wifi": true, "ble": false, "lora": false },
+  "console": "usb_cdc",
+  "deep_sleep": true,
+
+  "nets": [
+    {
+      "net": "status_led",
+      "pin": 2,
+      "mode": "output",
+      "external_pull": "none",
+      "note": "1k series resistor to the LED anode."
+    },
+    {
+      "net": "wake_button",
+      "pin": 4,
+      "mode": "input_pullup",
+      "external_pull": "none",
+      "note": "Active low against the internal pull-up. RTC-capable, so it doubles as the deep-sleep wake source."
+    }
+  ],
+
+  "buses": [
+    {
+      "kind": "i2c",
+      "id": "i2c0",
+      "sda": 8,
+      "scl": 9,
+      "hz": 100000,
+      "logic_v": 3.3,
+      "pullup_ohm": 4700,
+      "pullup_source": "4k7 fitted on the BME280 breakout; nothing else on the bus carries one",
+      "devices": [
+        { "ref": "sensor", "addr": "0x76", "logic_v": 3.3 }
+      ]
+    }
+  ],
+
+  "wake_sources": [
+    { "net": "wake_button", "pin": 4, "kind": "ext0" }
+  ],
+
+  "required_pins": {
+    "digital": 0,
+    "analog": 0,
+    "reason": "Everything this build needs is allocated. Battery sense is not fitted: the cell voltage is reported by the charger board, not sampled by the MCU."
+  }
+}

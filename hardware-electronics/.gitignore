@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Project working files, when a project is run inside the skill directory.
+# The skill's own examples/ fixtures are tracked; scratch output is not.
+/scratch/
+*.tmp.json

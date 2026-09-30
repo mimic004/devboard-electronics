@@ -1,0 +1,17 @@
+{
+  "schema": "hardware-electronics/tool-transcript",
+  "version": "1.0",
+  "note": "Recorded esptool output from a Heltec Vision Master E290. Flash reads 8 MB, which agrees with the board profile and disagrees with the product listing.",
+  "commands": [
+    {
+      "match": "chip[-_]id",
+      "returncode": 0,
+      "stdout": "esptool.py v4.8.1\nSerial port COM7\nConnecting....\nDetecting chip type... ESP32-S3\nChip is ESP32-S3 (QFN56) (revision v0.2)\nFeatures: WiFi, BLE, Embedded PSRAM 8MB (AP_3v3)\nCrystal is 40MHz\nMAC: d4:05:92:7b:c8:08\nUploading stub...\nRunning stub...\nStub running...\nWarning: ESP32-S3 has no Chip ID. Reading MAC instead.\nMAC: d4:05:92:7b:c8:08\nHard resetting via RTS pin...\n"
+    },
+    {
+      "match": "flash[-_]id",
+      "returncode": 0,
+      "stdout": "esptool.py v4.8.1\nSerial port COM7\nConnecting....\nDetecting chip type... ESP32-S3\nChip is ESP32-S3 (QFN56) (revision v0.2)\nFeatures: WiFi, BLE, Embedded PSRAM 8MB (AP_3v3)\nCrystal is 40MHz\nMAC: d4:05:92:7b:c8:08\nUploading stub...\nRunning stub...\nStub running...\nManufacturer: 85\nDevice: 2017\nDetected flash size: 8MB\nHard resetting via RTS pin...\n"
+    }
+  ]
+}

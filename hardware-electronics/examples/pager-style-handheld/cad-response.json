@@ -1,0 +1,69 @@
+{
+  "schema": "hardware-electronics/cad-response",
+  "version": "1.0",
+  "responds_to": "sha256:ba97059426065df73e9e4cb819be81bf147dc95e8f7e8bd200de47abd002592a",
+  "generated": "2026-09-27T10:10:00-06:00",
+  "status": "accepted_with_constraints",
+
+  "realised": {
+    "envelope": {
+      "interior": { "l": 106.0, "w": 72.0, "h": 16.0 },
+      "exterior": { "l": 110.0, "w": 76.0, "h": 20.0 },
+      "wall": 2.0
+    },
+    "placements": {
+      "mainboard": { "x": 0.0, "y": 0.0, "z": 13.5, "rotation_z": 0.0 },
+      "battery": { "x": -20.0, "y": 18.0, "z": 0.0, "rotation_z": 0.0 },
+      "speaker": { "x": 33.0, "y": -8.0, "z": 0.0, "rotation_z": 0.0 },
+      "expander": { "x": 25.0, "y": 22.0, "z": 0.0, "rotation_z": 0.0 },
+      "motor": { "x": -15.0, "y": -8.0, "z": 0.0, "rotation_z": 0.0 },
+      "piezo": { "x": -40.0, "y": -15.0, "z": 0.0, "rotation_z": 0.0 }
+    },
+    "channels": {
+      "batt_to_jp1": { "w": 4.4, "h": 3.2 },
+      "spk_to_amp": { "w": 6.0, "h": 2.0 }
+    },
+    "clearances": {
+      "spk-air-gap": 0.55,
+      "wall-min": 2.0
+    }
+  },
+
+  "assertions": [
+    { "id": "spk-air-gap", "result": "pass", "value": 0.55, "note": "Inside the 0.3-0.8 mm band at both ends." },
+    { "id": "antenna-clear", "result": "pass", "value": null, "note": "No intersection between the LoRa keep-out and the battery, the speaker magnet keep-out or the motor." },
+    { "id": "batt-clear-of-usb", "result": "pass", "value": null, "note": "The battery bay was moved out of the USB channel's plan footprint. The channel is now sized by the plug, not by whatever the cell left over." },
+    { "id": "wall-min", "result": "pass", "value": 2.0 },
+    { "id": "no-filled-filament", "result": "pass", "value": "PETG", "note": "Plain PETG. No filled filament anywhere in the shell." }
+  ],
+
+  "counter_constraints": [
+    {
+      "component": "piezo",
+      "field": "footprint.d",
+      "was": 27.0,
+      "max_possible": 15.6,
+      "reason": "Largest free disc anywhere in the back shell once the battery, speaker, expander and side wall take their space. The battery is what costs the room.",
+      "action_required": "Change the BOM to a 15 mm disc.",
+      "acknowledged": true,
+      "acknowledged_in_hash": "sha256:ba97059426065df73e9e4cb819be81bf147dc95e8f7e8bd200de47abd002592a"
+    },
+    {
+      "component": "enclosure",
+      "field": "envelope.exterior.l",
+      "was": 105.0,
+      "required": 110.0,
+      "reason": "No arrangement of battery, expander, speaker and motor was found at 105 x 72 or 108 x 74. Re-solved at 94, 98 and 102 mm as well: none fit. 110 mm is the floor.",
+      "action_required": "Accept the larger body, or drop a component.",
+      "acknowledged": true,
+      "acknowledged_in_hash": "sha256:ba97059426065df73e9e4cb819be81bf147dc95e8f7e8bd200de47abd002592a"
+    }
+  ],
+
+  "artifacts": {
+    "stls": ["pager_p1_front_shell.stl", "pager_p2_back_shell.stl"],
+    "previews": ["front_preview.png", "back_preview.png"],
+    "scripts": ["pager_enclosure.py"],
+    "watertight": true
+  }
+}

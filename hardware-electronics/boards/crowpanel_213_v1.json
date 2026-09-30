@@ -1,0 +1,87 @@
+{
+  "schema": "hardware-electronics/board",
+  "version": "1.0",
+  "id": "crowpanel_213_v1",
+  "display_name": "CrowPanel 2.13 (version 1 board) - SUPERSEDED",
+  "status": "superseded",
+  "superseded_by": "heltec_vision_master_e290",
+  "family": "ESP32-S3",
+  "mcu": {
+    "family": "ESP32-S3",
+    "cores": 2,
+    "flash_mb": null,
+    "psram_mb": null
+  },
+  "fqbn": null,
+  "logic_v": 3.3,
+
+  "gpio_valid": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48],
+  "input_only": [],
+
+  "strapping": {
+    "0": "Boot mode select + strapping.",
+    "3": "JTAG source select + strapping.",
+    "45": "Selects VDD_SPI voltage at boot. An external pull-up bricks boot.",
+    "46": "Boot mode / ROM message printing + strapping."
+  },
+
+  "rtc_capable": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
+
+  "adc1": {
+    "1": "ADC1_CH0", "2": "ADC1_CH1", "3": "ADC1_CH2", "4": "ADC1_CH3", "5": "ADC1_CH4",
+    "6": "ADC1_CH5", "7": "ADC1_CH6", "8": "ADC1_CH7", "9": "ADC1_CH8", "10": "ADC1_CH9"
+  },
+  "adc2": {
+    "11": "ADC2_CH0", "12": "ADC2_CH1", "13": "ADC2_CH2", "14": "ADC2_CH3", "15": "ADC2_CH4",
+    "16": "ADC2_CH5", "17": "ADC2_CH6", "18": "ADC2_CH7", "19": "ADC2_CH8", "20": "ADC2_CH9"
+  },
+
+  "usb": [19, 20],
+  "jtag": [39, 40, 41, 42],
+
+  "consumed": {
+    "1": "Button",
+    "2": "Button",
+    "4": "Button",
+    "5": "Button",
+    "6": "Button",
+    "7": "PANEL POWER ENABLE. On THIS board GPIO7 gates the e-paper controller's rail. On the Heltec E290 the same number is VBAT_READ. This single collision is why a pin question is never answerable without a board ID.",
+    "40": "I2C (see pin_notes)",
+    "41": "I2C (see pin_notes)"
+  },
+
+  "free": null,
+  "conditional_free": {},
+  "contradicted_header_pins": {},
+
+  "onboard_i2c": {
+    "sda": 40,
+    "scl": 41,
+    "pullup_ohm": null,
+    "note": "GPIO 40/41 on this board. The E290 uses 38/39. The numbers do not transfer."
+  },
+
+  "display": {
+    "panel": "2.13 inch e-paper",
+    "controller": "JD79661 / EK79029",
+    "power_enable_gpio": 7,
+    "power_enable_level": "high"
+  },
+
+  "radio": { "wifi": true, "ble": true, "lora": false },
+
+  "pin_notes": {
+    "7": "Panel power enable. With this line LOW the controller is unpowered, BUSY floats, and EVERY e-paper refresh appears to succeed - in about 29 ms. Nothing errors. This is the origin of the IMPLAUSIBLE_SUCCESS check: a validator that only asks 'did it return without error' manufactures false confidence."
+  },
+
+  "notes": [
+    "SUPERSEDED. This profile is retained because its pin facts are still true of the v1 CrowPanel hardware and because it is the counter-example that justifies mandatory board IDs.",
+    "GPIO 7 means the opposite thing here and on the Heltec E290. An agent that greps a repository for 'GPIO 7' gets a confidently wrong answer.",
+    "ADC2 is unusable on this family while the Wi-Fi driver is active: adc2_get_raw() returns ESP_ERR_TIMEOUT. That is true here exactly as it is on the E290.",
+    "The panel driver lesson from this board is mandatory everywhere: every busy-wait needs a timeout, and you must wait for BUSY to ASSERT before waiting for it to release. That is what distinguishes 'finished quickly' from 'never started'."
+  ],
+
+  "sources": [
+    "reference project A, docs/hardware-findings.md (titled 'CrowPanel 2.13 (version 1 board)')"
+  ]
+}

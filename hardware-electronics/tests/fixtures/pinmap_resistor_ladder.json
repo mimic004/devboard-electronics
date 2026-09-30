@@ -1,0 +1,40 @@
+{
+  "schema": "hardware-electronics/pinmap",
+  "version": "1.0",
+  "project": "fixture-resistor-ladder-keypad",
+  "board": "heltec_vision_master_e290",
+
+  "radio": { "wifi": true, "ble": false, "lora": true },
+  "console": "usb_cdc",
+  "deep_sleep": true,
+
+  "nets": [
+    { "net": "keypad_ladder", "pin": 17, "mode": "analog", "note": "The idea under test: eight buttons on a resistor ladder into one analog pin." },
+    { "net": "expander.INT", "pin": 44, "mode": "input_pullup", "note": "Deliberately wrong: GPIO44 is not RTC-capable." },
+    { "net": "led", "pin": 45, "mode": "output", "external_pull": "up", "external_pull_ohm": 10000, "note": "Deliberately wrong: an external pull-up on the VDD_SPI strapping pin." },
+    { "net": "spare", "pin": 6, "mode": "output", "note": "Deliberately wrong: GPIO6 is the e-ink BUSY line on this board." }
+  ],
+
+  "buses": [
+    {
+      "kind": "i2c",
+      "id": "i2c0",
+      "sda": 39,
+      "scl": 38,
+      "hz": 100000,
+      "devices": [
+        { "ref": "expander", "addr": "0x20", "part_ref": "mcp23017-waveshare" },
+        { "ref": "second_expander", "addr": "0x20", "part_ref": "mcp23017-waveshare" },
+        { "ref": "haptic", "addr": "0x5A", "part_ref": "drv2605l-adafruit2305" }
+      ]
+    }
+  ],
+
+  "analog_inputs": [
+    { "net": "keypad_ladder", "pin": 17, "purpose": "Eight buttons on a resistor ladder." }
+  ],
+
+  "wake_sources": [
+    { "net": "expander.INT", "pin": 44, "kind": "ext0" }
+  ]
+}

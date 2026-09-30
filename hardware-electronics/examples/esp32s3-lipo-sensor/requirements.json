@@ -1,0 +1,101 @@
+{
+  "schema": "hardware-electronics/requirements",
+  "version": "1.0",
+  "project": "esp32s3-lipo-sensor",
+
+  "runtime": {
+    "target_days": {
+      "value": 30,
+      "unit": "days",
+      "provenance": "assumed",
+      "source": "User statement: 'I want to charge it about once a month.'",
+      "verify_before_build": false
+    },
+    "duty_description": "Wake every 15 minutes, read the sensor, associate to Wi-Fi, publish, sleep. Roughly 9 s awake per cycle.",
+    "rechargeable": true,
+    "recharge_interval_days": {
+      "value": 30,
+      "unit": "days",
+      "provenance": "inferred",
+      "source": "Follows from the runtime target."
+    }
+  },
+
+  "must_fit": [
+    {
+      "id": "enclosure_interior_length",
+      "axis": "l",
+      "max_mm": 95.0,
+      "provenance": "measured",
+      "source": "Calipers on the interior of the bought ABS box, 2026-09-21.",
+      "reason": "Everything has to sit inside the box that already exists."
+    },
+    {
+      "id": "enclosure_interior_width",
+      "axis": "w",
+      "max_mm": 60.0,
+      "provenance": "measured",
+      "source": "Calipers on the interior of the bought ABS box, 2026-09-21."
+    },
+    {
+      "id": "enclosure_interior_height",
+      "axis": "h",
+      "max_mm": 22.0,
+      "provenance": "measured",
+      "source": "Calipers, lid closed, allowing for the lid's internal ribs."
+    }
+  ],
+
+  "environment": {
+    "indoor": false,
+    "temp_min_c": {
+      "value": -5,
+      "unit": "C",
+      "provenance": "assumed",
+      "source": "Local winter minimum in an unheated greenhouse.",
+      "verify_before_build": false
+    },
+    "temp_max_c": {
+      "value": 45,
+      "unit": "C",
+      "provenance": "assumed",
+      "source": "Greenhouse summer peak.",
+      "how_to_close": "Log it for a week with the sensor itself before trusting the cell's temperature rating."
+    },
+    "humidity": "Condensing at night. The board needs conformal coating or a desiccant sachet.",
+    "ingress_rating_target": "none - the bought box is splash resistant only",
+    "uv_exposure": true
+  },
+
+  "connectivity": {
+    "wifi": true,
+    "ble": false,
+    "lora": false,
+    "zigbee": false,
+    "band_mhz": [2400, 2500],
+    "region": "worldwide 2.4 GHz ISM",
+    "range_target_m": {
+      "value": 40,
+      "unit": "m",
+      "provenance": "assumed",
+      "source": "Distance from the greenhouse to the house access point.",
+      "how_to_close": "Range-test in place, inside the closed box, in the greenhouse - not on the desk next to the router."
+    }
+  },
+
+  "interactions": [
+    { "id": "status", "kind": "led", "count": 1, "notes": "One LED, lit only while awake." },
+    { "id": "wake", "kind": "button", "count": 1, "notes": "Forces an immediate reading. Doubles as the deep-sleep wake source." }
+  ],
+
+  "budget": {
+    "target_usd": 45.0,
+    "hard_cap_usd": 70.0
+  },
+
+  "non_goals": [
+    "No display. The data lives on the network.",
+    "No local storage. A missed reading is not worth an SD card.",
+    "No enclosure design - see project.json skipped phase 8."
+  ]
+}

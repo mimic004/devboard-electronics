@@ -1,0 +1,274 @@
+{
+  "schema": "hardware-electronics/bom",
+  "version": "1.0",
+  "project": "pager-style-handheld",
+  "generated": "2026-09-27",
+
+  "enclosure": {
+    "printed": true,
+    "material": "PETG",
+    "material_filled": "none"
+  },
+
+  "rows": [
+    {
+      "id": "mainboard",
+      "description": "Heltec Vision Master E290: ESP32-S3 + 2.9 inch e-paper + SX1262 LoRa",
+      "qty": 1,
+      "mpn": "Vision Master E290",
+      "unit_cost_usd": 34.0,
+      "variant": {
+        "axis": "lora_frequency_band",
+        "chosen": "902-928 MHz (US915)",
+        "locked_at_order": true,
+        "options": ["433 MHz", "470-510 MHz", "863-870 MHz (EU868)", "902-928 MHz (US915)"],
+        "alternatives_rejected": [
+          { "value": "863-870 MHz (EU868)", "why": "Wrong region. The band is fixed when you order and cannot be changed afterwards, however much of a stretch goal LoRa is." }
+        ]
+      },
+      "footprint": {
+        "shape": "rect",
+        "l": 87.96,
+        "w": 36.63,
+        "h": 1.6,
+        "height_includes": "body_only",
+        "provenance": { "l": "datasheet", "w": "datasheet", "h": "measured" },
+        "verify_before": "print"
+      },
+      "connector": {
+        "type": "SH1.25",
+        "pitch_mm": 1.25,
+        "pins": 2,
+        "gender": "socket",
+        "net": "battery",
+        "mates_with": "battery",
+        "polarity_verified": true
+      },
+      "electrical": { "rail": "VBAT", "v_min": 3.0, "v_max": 4.3, "logic_v": 3.3, "i_avg_ma": 40.0, "i_peak_ma": 220.0 },
+      "rf": { "band_mhz": [902, 928], "transmits": true, "antenna": "ufl" },
+      "drives_cad": {
+        "parameters": ["board_l", "board_w", "board_t", "win_l", "win_w", "win_offset_x", "usb_ch_w", "usb_recept_h"],
+        "owner_script": "pager_enclosure.py"
+      },
+      "failure_mode": "loud",
+      "order_plan": {
+        "order_one_first": true,
+        "reason": "Almost every open gate on this project needs the physical board: the display window offset, the USB receptacle height, the charge resistor and the sleep current."
+      },
+      "notes": "The 8 vs 16 MB flash question was settled by reading the chip, not the listing. See measurements.jsonl."
+    },
+
+    {
+      "id": "battery",
+      "description": "LiPo pouch cell, 1100 mAh, SH1.25-2P lead",
+      "qty": 1,
+      "unit_cost_usd": 9.0,
+      "footprint": {
+        "shape": "rect",
+        "l": 50.0,
+        "w": 29.0,
+        "h": 7.0,
+        "height_includes": "body_only",
+        "provenance": { "l": "measured", "w": "measured", "h": "measured" },
+        "verify_before": "none"
+      },
+      "connector": {
+        "type": "SH1.25",
+        "pitch_mm": 1.25,
+        "pins": 2,
+        "gender": "plug",
+        "net": "battery",
+        "mates_with": "mainboard",
+        "polarity_verified": true
+      },
+      "electrical": { "rail": "VBAT", "capacity_mah": 1100, "v_min": 3.0, "v_max": 4.2 },
+      "drives_cad": { "parameters": ["batt_l", "batt_w", "batt_t"], "owner_script": "pager_enclosure.py" },
+      "failure_mode": "degraded",
+      "notes": "1100 mAh clears the 600 mAh floor that the board's fixed 600 mA charge current imposes. A 500 mAh cell would charge at 1.2 C and is not safe here. A JST-PH 2.0 lead will NOT mate with this board's 1.25 mm socket - the cell was bought with the right lead, not adapted."
+    },
+
+    {
+      "id": "speaker",
+      "description": "8 ohm ~1 W speaker, 20 mm",
+      "qty": 1,
+      "unit_cost_usd": 3.0,
+      "variant": {
+        "axis": "diameter",
+        "chosen": "20mm",
+        "locked_at_order": true,
+        "alternatives_rejected": [
+          { "value": "28mm", "why": "The obvious 'mini metal speaker' substitute is 28 mm and will not fit the 20 mm pocket. This is the trap the Drives CAD column exists for." }
+        ]
+      },
+      "footprint": {
+        "shape": "circle",
+        "d": 20.0,
+        "h": 4.0,
+        "height_includes": "body_only",
+        "provenance": { "d": "measured", "h": "measured" },
+        "verify_before": "none",
+        "fit_coupon_required": true
+      },
+      "connector": { "type": "solder_pad", "gender": "solder_pad" },
+      "electrical": { "rail": "VBAT_via_amp", "i_avg_ma": 0.2, "i_peak_ma": 700, "impedance_ohm": 8, "power_w": 1.0 },
+      "drives_cad": { "parameters": ["spk_d", "spk_t"], "owner_script": "pager_enclosure.py" },
+      "failure_mode": "loud",
+      "substitution_trap": "Adafruit 1890 'mini metal speaker' is 28 mm, not 20 mm, and will not fit the pocket."
+    },
+
+    {
+      "id": "piezo",
+      "description": "Piezo disc, 15 mm",
+      "qty": 1,
+      "unit_cost_usd": 0.8,
+      "variant": {
+        "axis": "diameter",
+        "chosen": "15mm",
+        "locked_at_order": true,
+        "alternatives_rejected": [
+          { "value": "27mm", "why": "The BOM originally said 20-27 mm. A CAD-side search over the real back-shell footprints found the largest free disc anywhere was 15.6 mm once the battery, speaker and expander had taken their space. The BOM moved, not the enclosure - the dependency runs both ways." }
+        ]
+      },
+      "footprint": {
+        "shape": "circle",
+        "d": 15.0,
+        "h": 2.5,
+        "height_includes": "body_only",
+        "provenance": { "d": "measured", "h": "measured" },
+        "verify_before": "none"
+      },
+      "connector": { "type": "solder_pad", "gender": "solder_pad" },
+      "electrical": { "rail": "3V3", "i_peak_ma": 12 },
+      "drives_cad": { "parameters": ["piezo_d", "piezo_t"], "owner_script": "pager_enclosure.py" },
+      "failure_mode": "loud"
+    },
+
+    {
+      "id": "expander",
+      "description": "MCP23017 16-channel I2C GPIO expander breakout",
+      "qty": 1,
+      "part_ref": "mcp23017-waveshare",
+      "unit_cost_usd": 6.5,
+      "footprint": {
+        "shape": "rect",
+        "l": 38.0,
+        "w": 23.0,
+        "h": 13.0,
+        "height_includes": "over_connector",
+        "provenance": { "l": "measured", "w": "measured", "h": "measured" },
+        "verify_before": "none"
+      },
+      "connector": { "type": "JST-SH", "pitch_mm": 1.0, "pins": 4, "gender": "plug", "net": "i2c0", "mates_with": null },
+      "electrical": { "rail": "3V3", "v_min": 1.8, "v_max": 5.5, "logic_v": 3.3, "i_avg_ma": 1.0, "i_peak_ma": 2.0 },
+      "drives_cad": { "parameters": ["exp_l", "exp_w", "exp_h"], "owner_script": "pager_enclosure.py" },
+      "failure_mode": "loud",
+      "notes": "Strapped to 0x20, which does not collide with the haptic driver's fixed 0x5A. This part exists only because the board has no free ADC1 channel, and it is what grew the body from 105 x 72 to 110 x 76 mm."
+    },
+
+    {
+      "id": "motor",
+      "description": "Coin ERM vibration motor, 10 mm",
+      "qty": 1,
+      "unit_cost_usd": 2.2,
+      "footprint": {
+        "shape": "circle",
+        "d": 10.0,
+        "h": 3.0,
+        "height_includes": "body_only",
+        "provenance": { "d": "measured", "h": "measured" },
+        "verify_before": "none"
+      },
+      "connector": { "type": "solder_pad", "gender": "solder_pad" },
+      "electrical": { "rail": "3V3_via_haptic", "i_avg_ma": 0.0, "i_peak_ma": 156 },
+      "drives_cad": { "parameters": ["motor_d", "motor_t"], "owner_script": "pager_enclosure.py" },
+      "failure_mode": "silent",
+      "liveness_check": {
+        "required": true,
+        "how": "One short pulse at every boot, where the user can feel it. A motor that has come unstuck from its pad produces no error and no buzz, and the first you know is a missed alert."
+      }
+    },
+
+    {
+      "id": "amp",
+      "description": "MAX98357A I2S class-D mono amplifier breakout",
+      "qty": 1,
+      "part_ref": "max98357a-adafruit3006",
+      "unit_cost_usd": 5.95,
+      "footprint": {
+        "shape": "rect",
+        "l": 20.7,
+        "w": 17.0,
+        "h": 3.0,
+        "height_includes": "body_only",
+        "provenance": { "l": "vendor_claim", "w": "vendor_claim", "h": "vendor_claim" },
+        "verify_before": "none"
+      },
+      "connector": { "type": "solder_pad", "gender": "solder_pad" },
+      "electrical": { "rail": "VBAT", "v_min": 2.5, "v_max": 5.5, "logic_v": 3.3, "i_avg_ma": 2.4, "i_peak_ma": 1000 },
+      "failure_mode": "loud",
+      "notes": "Fed from VBAT, NOT from the board's 600 mA 3V3 LDO. It can pull about 1 A peak into a low-impedance load, and putting it on the LDO would brown out the whole board."
+    },
+
+    {
+      "id": "haptic",
+      "description": "DRV2605L I2C haptic driver breakout",
+      "qty": 1,
+      "part_ref": "drv2605l-adafruit2305",
+      "unit_cost_usd": 7.5,
+      "footprint": {
+        "shape": "rect",
+        "l": 20.0,
+        "w": 18.0,
+        "h": 3.0,
+        "height_includes": "body_only",
+        "provenance": { "l": "vendor_claim", "w": "vendor_claim", "h": "vendor_claim" },
+        "verify_before": "none"
+      },
+      "connector": { "type": "solder_pad", "gender": "solder_pad" },
+      "electrical": { "rail": "3V3", "v_min": 2.0, "v_max": 5.2, "logic_v": 3.3, "i_avg_ma": 0.5, "i_peak_ma": 160 },
+      "failure_mode": "silent",
+      "liveness_check": {
+        "required": true,
+        "how": "Read back the device ID register on every boot and log a fault if it does not answer at 0x5A."
+      },
+      "notes": "Address is fixed at 0x5A. Two of these cannot share a bus without a multiplexer."
+    },
+
+    {
+      "id": "mic",
+      "description": "SPH0645LM4H I2S MEMS microphone breakout",
+      "qty": 1,
+      "part_ref": "sph0645lm4h-adafruit3421",
+      "unit_cost_usd": 6.95,
+      "footprint": {
+        "shape": "rect",
+        "l": 18.0,
+        "w": 15.0,
+        "h": 3.0,
+        "height_includes": "body_only",
+        "provenance": { "l": "vendor_claim", "w": "vendor_claim", "h": "vendor_claim" },
+        "verify_before": "none"
+      },
+      "connector": { "type": "solder_pad", "gender": "solder_pad" },
+      "electrical": { "rail": "3V3", "v_min": 1.6, "v_max": 3.6, "logic_v": 3.3, "i_avg_ma": 0.6, "i_peak_ma": 1.5 },
+      "failure_mode": "degraded",
+      "notes": "Bottom-port. The port faces the shell opening and is gasketed; an unsealed mic hears the motor, the speaker back-wave and every button click."
+    },
+
+    {
+      "id": "lora_antenna",
+      "description": "902-928 MHz whip antenna with U.FL pigtail",
+      "qty": 1,
+      "unit_cost_usd": 4.0,
+      "variant": {
+        "axis": "band",
+        "chosen": "902-928 MHz",
+        "locked_at_order": true
+      },
+      "connector": { "type": "U.FL", "gender": "plug", "net": "lora", "mates_with": null },
+      "rf": { "band_mhz": [902, 928], "transmits": true, "antenna": "ufl" },
+      "failure_mode": "degraded",
+      "notes": "Must match the board's band variant. Never power the radio without it connected."
+    }
+  ]
+}

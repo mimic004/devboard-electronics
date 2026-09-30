@@ -1,0 +1,59 @@
+{
+  "schema": "hardware-electronics/component-manifest",
+  "version": "1.0",
+  "project": "fixture-round-vs-bounding-box",
+  "units": { "length": "mm" },
+  "datum": {
+    "origin": "interior_centre",
+    "axes": "+X long axis, +Y across, +Z up",
+    "note": "Two 35 mm discs whose BOUNDING BOXES overlap in the corner but whose circles do not touch. Describing a 35 mm circle by its bounding box reserves 21% more area than it occupies, all of it in the corners - which is exactly where a round part usually has to live."
+  },
+  "envelope": {
+    "owner": "cad",
+    "interior": { "l": 140.0, "w": 140.0, "h": 20.0 },
+    "material": "PETG",
+    "material_filled": "none"
+  },
+  "components": [
+    {
+      "id": "disc_a",
+      "class": "transducer",
+      "drives_cad": true,
+      "footprint": {
+        "shape": "circle",
+        "d": 35.0,
+        "h": 5.0,
+        "provenance": { "d": "measured", "h": "measured" },
+        "verify_before": "none"
+      },
+      "placement": { "owner": "cad", "x": 0.0, "y": 0.0, "z": 0.0, "rotation_z": 0.0 },
+      "orientation_constraint": {
+        "locked": true,
+        "kind": "radiating_axis",
+        "axis": "-Z",
+        "reason": "Radiates along its normal toward the grille."
+      },
+      "cad_parameters": { "disc_a_d": "footprint.d" }
+    },
+    {
+      "id": "disc_b",
+      "class": "transducer",
+      "drives_cad": true,
+      "footprint": {
+        "shape": "circle",
+        "d": 35.0,
+        "h": 5.0,
+        "provenance": { "d": "measured", "h": "measured" },
+        "verify_before": "none"
+      },
+      "placement": { "owner": "cad", "x": 30.0, "y": 30.0, "z": 0.0, "rotation_z": 0.0 },
+      "orientation_constraint": {
+        "locked": true,
+        "kind": "radiating_axis",
+        "axis": "-Z",
+        "reason": "Radiates along its normal toward the grille."
+      },
+      "cad_parameters": { "disc_b_d": "footprint.d" }
+    }
+  ]
+}
