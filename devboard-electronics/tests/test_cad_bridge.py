@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 
 from conftest import codes, finding, run_tool
 
@@ -156,8 +157,14 @@ def _script(tmp_path, body: str) -> str:
 def test_sentinel_is_trusted_over_a_nonzero_exit(tmp_path):
     """A nonzero exit WITH a valid sentinel is a pass.
 
-    This is the whole point: CadQuery exits -1073740940 on success here, from an
-    OpenCASCADE teardown crash after the STL is already written.
+    This is the whole point: CadQuery exits -1073740940 on success on Windows,
+    from an OpenCASCADE teardown crash after the STL is already written.
+
+    The universal contract - a nonzero exit plus a valid sentinel is a pass - is
+    asserted everywhere. Recognising the specific NTSTATUS value is asserted only
+    on Windows, because those codes exist only there: POSIX masks an exit status
+    to its low 8 bits, so the same call surfaces as an unrelated small number.
+    Asserting otherwise would be testing the platform, not the runner.
     """
     script = _script(
         tmp_path,
@@ -169,9 +176,14 @@ def test_sentinel_is_trusted_over_a_nonzero_exit(tmp_path):
     )
     out, rc = run_tool(RUNNER, script, "--expect-stl", "front.stl")
     assert rc == 0, [f for f in out["findings"] if f["severity"] != "info"]
-    assert "TEARDOWN_CRASH" in codes(out)
+    assert out["returncode"] != 0, "the script must genuinely have exited nonzero"
     assert "SENTINEL_OK" in codes(out)
     assert "EXPECTED_STL_PRESENT" in codes(out)
+
+    if sys.platform.startswith("win"):
+        assert "TEARDOWN_CRASH" in codes(out)
+        f = finding(out, "TEARDOWN_CRASH")
+        assert "Read stdout, not the exit code" in f["message"]
 
 
 def test_fresh_artifacts_are_the_fallback(tmp_path):
