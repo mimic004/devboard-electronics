@@ -11,7 +11,7 @@ __pycache__/
 .ruff_cache/
 
 # Working files produced by the tools, not part of the skills
-hardware-profiles/drafts/
+board-profiles/drafts/
 *.bak
 *.tmp.json
 

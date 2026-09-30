@@ -1,0 +1,261 @@
+{
+  "schema": "hardware-electronics/component-manifest",
+  "version": "1.0",
+  "project": "vendor-sensor-enclosure",
+  "generated": "2026-09-27T12:30:00-06:00",
+  "generator": "electronics-design@0.1.0",
+
+  "units": {
+    "length": "mm",
+    "angle": "deg",
+    "current": "mA",
+    "voltage": "V",
+    "mass": "g",
+    "temp": "C"
+  },
+
+  "datum": {
+    "origin": "box_interior_floor_centre",
+    "axes": "+X along the long axis toward the hinge; +Y across the width; +Z up toward the lid",
+    "note": "The lid hinges about the +X edge. The sensor lives in the FRONT wall (-X end), as far from the hinge as possible, because the magnet's travel per degree of lid opening is largest there - which is what makes the open/closed distinction crisp instead of marginal."
+  },
+
+  "envelope": {
+    "owner": "cad",
+    "interior": { "l": 130.0, "w": 78.0, "h": 50.0 },
+    "exterior": { "l": 138.0, "w": 86.0, "h": 58.0 },
+    "split_plane_z": 50.0,
+    "wall": 2.4,
+    "material": "PLA",
+    "material_filled": "none",
+    "rf_transparent": true
+  },
+
+  "components": [
+    {
+      "id": "zigbee_sensor",
+      "bom_ref": "zigbee_sensor",
+      "class": "sensor_module",
+      "drives_cad": true,
+
+      "footprint": {
+        "shape": "rect",
+        "l": 41.0,
+        "w": 22.0,
+        "h": 11.0,
+        "tolerance": 0.4,
+        "provenance": { "l": "measured", "w": "measured", "h": "measured" },
+        "verify_before": "none"
+      },
+
+      "placement": {
+        "owner": "cad",
+        "x": -44.0,
+        "y": 0.0,
+        "z": 8.0,
+        "rotation_z": 0.0,
+        "face": "front_wall_embedded",
+        "seated": "on_edge"
+      },
+
+      "orientation_constraint": {
+        "locked": true,
+        "kind": "sensing_axis",
+        "feature": "marker_line_on_41mm_face",
+        "axis": "+Z",
+        "reason": "The reed switch sits against one of the 41 mm LONG faces, and the manual says to align the marker lines on body and magnet. The sensor therefore stands ON ITS EDGE in the wall - 41 mm across, 11 mm into the wall, 22 mm tall - so the marked face points straight up at the lid. Laying it flat, which is the obvious thing to do, puts the magnet off-axis and the box stops reporting reliably.",
+        "drives": ["wall_thickness", "boss_geometry", "lid_magnet_pocket", "interior_depth"],
+        "cost": "The boss eats about 13.8 mm of interior depth at the front wall."
+      },
+
+      "mounting": {
+        "method": "drop_in_boss",
+        "why_not_screws": "The sensor has no mounting holes and a screwless snap shell. Anything that clamps it is something that has to be undone to change a coin cell.",
+        "features": [
+          { "kind": "boss", "wall": 2.0, "depth": 11.4, "open_top": true }
+        ]
+      },
+
+      "keepouts": [
+        {
+          "id": "zigbee_antenna",
+          "kind": "rf",
+          "shape": "rect",
+          "l": 12.0,
+          "w": 22.0,
+          "h": 11.0,
+          "ref": "short_end",
+          "offset": { "x": -14.5, "y": 0.0 },
+          "band_mhz": [2400, 2500],
+          "material_rule": "no carbon-, glass- or metal-filled filament anywhere in the enclosure",
+          "reason": "PCB meander antenna at one short end. The magnet covers only the middle ~20 mm of the 41 mm body, so it stays clear of the antenna."
+        },
+        {
+          "id": "ventilation",
+          "kind": "thermal",
+          "shape": "rect",
+          "l": 30.0,
+          "w": 20.0,
+          "h": 11.0,
+          "ref": "back_face",
+          "offset": { "x": 0.0, "y": 0.0 },
+          "requires": "vents",
+          "reason": "The vendor manual explicitly warns against enclosing the sensor without ventilation. A sealed boss is the obvious thing to print and it is the wrong thing to print."
+        },
+        {
+          "id": "liftout_clearance",
+          "kind": "access",
+          "shape": "rect",
+          "l": 45.0,
+          "w": 26.0,
+          "h": 14.0,
+          "ref": "above",
+          "offset": { "x": 0.0, "y": 0.0, "z": 11.0 },
+          "reason": "The sensor must lift STRAIGHT OUT. Its cell is in a screwless snap shell with no documented way to open it, so a battery change is 'lift it out, swap, drop it back in'. A design that traps the sensor is a design that has to be destroyed to change a coin cell."
+        }
+      ],
+
+      "access": [
+        {
+          "id": "reset_window",
+          "kind": "window",
+          "shape": "rect",
+          "l": 12.0,
+          "w": 8.0,
+          "face": "interior",
+          "reason": "The reset button is on the front face, not under the cover, so re-pairing and range-testing need no disassembly."
+        }
+      ],
+
+      "mate": {
+        "with": "lid_magnet",
+        "gap_closed_mm": 2.0,
+        "gap_release_mm": 22.0,
+        "gap_source": "measured",
+        "dynamic": true,
+        "dynamic_note": "KINEMATIC, not static. The gap sweeps through 22 mm at roughly 19 degrees of lid opening. That is deliberate: a knock against the box will not register as 'meds taken', but a real open always will. Verifying this needs a hinge SWEEP - checking the closed position and the fully-open position tells you nothing about where the transition actually happens. See the open question in the skill's README; this manifest can DECLARE the constraint but nothing in this skill can yet evaluate it through a motion."
+      },
+
+      "serviceability": {
+        "battery": "CR1632",
+        "removable": true,
+        "requirement": "Must lift straight out without tools and without flexing the boss."
+      },
+
+      "thermal": { "dissipation_mw": 1, "max_ambient_c": 40, "needs_airflow": true },
+      "electrical": { "rail": "internal", "v_min": 2.0, "v_max": 3.3 },
+
+      "failure_mode": "silent",
+      "liveness_check": {
+        "required": true,
+        "how": "A home-automation last_seen automation plus a battery-level alert. A dead sensor fails silently, and the silence is indistinguishable from the good outcome it is supposed to report."
+      },
+
+      "cad_parameters": {
+        "sensor_l": "footprint.l",
+        "sensor_w": "footprint.w",
+        "sensor_h": "footprint.h",
+        "sensor_recess": "mate.gap_closed_mm"
+      }
+    },
+
+    {
+      "id": "lid_magnet",
+      "bom_ref": "lid_magnet",
+      "class": "magnet",
+      "drives_cad": true,
+
+      "footprint": {
+        "shape": "rect",
+        "l": 20.0,
+        "w": 10.0,
+        "h": 3.0,
+        "tolerance": 0.2,
+        "provenance": { "l": "measured", "w": "measured", "h": "measured" },
+        "verify_before": "none"
+      },
+
+      "placement": {
+        "owner": "cad",
+        "x": -44.0,
+        "y": 0.0,
+        "z": 47.0,
+        "rotation_z": 0.0,
+        "face": "lid_interior"
+      },
+
+      "orientation_constraint": {
+        "locked": true,
+        "kind": "polarity_axis",
+        "axis": "-Z",
+        "reason": "The pole face must point down at the sensor's marked face, and the magnet's long axis must line up with the sensor's marker line. A block magnet dropped into a pocket the wrong way round still sticks to the pocket and still looks right, and the reed switch simply never closes.",
+        "drives": ["lid_magnet_pocket"]
+      },
+
+      "mounting": {
+        "method": "glued_pocket",
+        "features": [{ "kind": "pocket", "l": 20.4, "w": 10.4, "depth": 3.2 }]
+      },
+
+      "cad_parameters": {
+        "magnet_l": "footprint.l",
+        "magnet_w": "footprint.w",
+        "magnet_h": "footprint.h"
+      },
+
+      "substitution_trap": "A larger magnet does not simply improve margin: it lengthens the release distance, so the box starts reporting 'closed' while the lid is visibly ajar. The release gap is the specification, not the pull force."
+    }
+  ],
+
+  "assertions": [
+    {
+      "id": "magnet-closed-gap",
+      "subject": "lid_magnet",
+      "check": "clearance",
+      "target": "zigbee_sensor",
+      "min_mm": 0.5,
+      "max_mm": 2.0,
+      "owner": "cad",
+      "blocking": true,
+      "why": "The reed switch must be firmly closed with the lid shut. Above about 2 mm it becomes marginal and the box starts chattering between states every time someone walks past."
+    },
+    {
+      "id": "sensor-liftout",
+      "subject": "zigbee_sensor",
+      "check": "no_intersect",
+      "target": ["liftout_clearance"],
+      "owner": "cad",
+      "blocking": true,
+      "why": "Nothing may overhang the sensor boss. A coin-cell change must not require destroying the box."
+    },
+    {
+      "id": "wall-min",
+      "subject": "enclosure",
+      "check": "min_wall",
+      "min_mm": 1.6,
+      "owner": "cad",
+      "blocking": true,
+      "why": "The front wall carries the sensor boss and gets handled every day."
+    },
+    {
+      "id": "no-filled-filament",
+      "subject": "enclosure",
+      "check": "material_not_in",
+      "values": ["carbon_filled", "glass_filled", "metal_filled"],
+      "owner": "cad",
+      "blocking": true,
+      "why": "There is a 2.4 GHz PCB antenna inside this box. Filled filaments are lossy; plain PLA or PETG makes no measurable difference. Electronics owns this as a VETO even though CAD owns the material choice."
+    }
+  ],
+
+  "assembly_order": [
+    { "step": 1, "what": "Pair the sensor to the coordinator and range-test it on the shelf, before anything is printed around it.", "why_this_order": "If the radio does not reach from that shelf, the enclosure design is irrelevant and you have not wasted a print.", "irreversible": false },
+    { "step": 2, "what": "Print the front wall as a coupon and check the sensor drops in and lifts straight out.", "why_this_order": "The boss is a press fit against a measured part. Ten minutes here saves a ten-hour mistake.", "irreversible": false },
+    { "step": 3, "what": "Glue the magnet into the lid pocket, pole face down, long axis aligned with the sensor's marker line.", "why_this_order": "Glue is irreversible and the orientation is invisible once it is in. Check the state changes in the coordinator log BEFORE the glue sets.", "irreversible": true },
+    { "step": 4, "what": "Fit the hinge pin and sweep the lid, watching the coordinator log for the open/closed transition angle.", "why_this_order": "This is the only check that proves the kinematic constraint. A closed reading and an open reading say nothing about where the transition happens.", "irreversible": false },
+    { "step": 5, "what": "Enable the last_seen and battery-level automations.", "why_this_order": "Last, but not optional. Until this exists the system's failure mode is silence, and silence looks exactly like success.", "irreversible": false }
+  ],
+
+  "open_gates": []
+}
+

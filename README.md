@@ -11,8 +11,8 @@ inside it**, and the contract between the two.
 
 | Skill | Answers |
 |---|---|
-| [`hardware-electronics/`](hardware-electronics/) | Will this design work? Pin maps, power budgets, BOMs, bring-up, and a hash-locked handoff to CAD |
-| [`hardware-profiles/`](hardware-profiles/) | Why should we believe the board data it was checked against? |
+| [`electronics-design/`](electronics-design/) | Will this design work? Pin maps, power budgets, BOMs, bring-up, and a hash-locked handoff to CAD |
+| [`board-profiles/`](board-profiles/) | Why should we believe the board data it was checked against? |
 
 ## Why these exist
 
@@ -45,7 +45,7 @@ Two real failures set the bar:
 ## How they fit with `cad-skill`
 
 Peers, not parent and child. A request naming both — *"a printed case for my
-ESP32 weather station"* — starts in `hardware-electronics`, which produces a
+ESP32 weather station"* — starts in `electronics-design`, which produces a
 `component-manifest.json`, and then hands that to the CAD skill.
 
 **Electronics owns what is true about the part; CAD owns what is true about the
@@ -82,7 +82,7 @@ editing a dimension must.
 ### `cad_bridge/` — the CAD side, without forking the CAD skill
 
 `cad-skill` is licensed separately (PolyForm Noncommercial), so **it is not
-modified**. [`hardware-electronics/cad_bridge/`](hardware-electronics/cad_bridge/)
+modified**. [`electronics-design/cad_bridge/`](electronics-design/cad_bridge/)
 holds the integration instead:
 
 - `consume_manifest.py` — flattens a manifest into parameters a CadQuery script
@@ -97,7 +97,7 @@ successful build as a failure with an empty file list. `run_cad_model.py` judges
 a run by a stdout sentinel and by freshly written artefacts instead.
 
 Integration is a project instruction, not a fork. See
-[`cad_bridge/README.md`](hardware-electronics/cad_bridge/README.md).
+[`cad_bridge/README.md`](electronics-design/cad_bridge/README.md).
 
 ## Install
 
@@ -107,16 +107,16 @@ These are Claude Code / Copilot-style agent skills: a directory containing a
 ```bash
 # Claude Code
 git clone https://github.com/<you>/hardware-skills /tmp/hardware-skills
-cp -r /tmp/hardware-skills/hardware-electronics ~/.claude/skills/
-cp -r /tmp/hardware-skills/hardware-profiles    ~/.claude/skills/
+cp -r /tmp/hardware-skills/electronics-design ~/.claude/skills/
+cp -r /tmp/hardware-skills/board-profiles    ~/.claude/skills/
 ```
 
 ```powershell
 # GitHub Copilot app (Windows)
 $dst = "$env:APPDATA\com.github.githubapp\app-skills"
 git clone https://github.com/<you>/hardware-skills $env:TEMP\hardware-skills
-Copy-Item "$env:TEMP\hardware-skills\hardware-electronics" $dst -Recurse
-Copy-Item "$env:TEMP\hardware-skills\hardware-profiles"    $dst -Recurse
+Copy-Item "$env:TEMP\hardware-skills\electronics-design" $dst -Recurse
+Copy-Item "$env:TEMP\hardware-skills\board-profiles"    $dst -Recurse
 ```
 
 Then, in each skill directory:
@@ -132,7 +132,7 @@ create a venv `cad-skill` cannot share.
 
 ## What you get
 
-`hardware-electronics` runs nine gated phases. Each gate is a command with an
+`electronics-design` runs nine gated phases. Each gate is a command with an
 exit code; the agent derives its next action from a stable finding `code`, never
 from prose.
 
@@ -184,8 +184,8 @@ practice is cited as such and can be checked normally.
 ## Tests
 
 ```bash
-cd hardware-electronics && python -m pytest tests -q   # 141 tests
-cd hardware-profiles    && python -m pytest tests -q   #  51 tests
+cd electronics-design && python -m pytest tests -q   # 141 tests
+cd board-profiles    && python -m pytest tests -q   #  51 tests
 ```
 
 No hardware, no network. Serial sessions and `esptool` output are replayed from

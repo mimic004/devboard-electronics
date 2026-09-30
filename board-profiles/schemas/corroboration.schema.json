@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "board-profiles/corroboration.schema.json",
+  "title": "Corroboration record",
+  "description": "How many INDEPENDENT sources agree on each group of fields, what they disagree about, and what is still unresolved. This exists because the claim 'confirmed by at least three of: datasheet, schematic, variant header, community firmware' was previously a prose note that nothing could check - which is the same 'correct and unenforceable' failure the paired electronics-design skill was built to prevent.",
+
+  "$defs": {
+    "source": {
+      "type": "object",
+      "required": ["id", "kind", "ref"],
+      "properties": {
+        "id": {
+          "description": "Short stable handle, used to detect the same source cited twice.",
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "description": "What sort of source this is. Only independent kinds count toward a corroboration threshold: listing, product_page, faq and pinout_image never do.",
+          "enum": [
+            "listing",
+            "product_page",
+            "faq",
+            "pinout_image",
+            "datasheet",
+            "schematic",
+            "board_definition",
+            "variant_header",
+            "community_firmware",
+            "measurement"
+          ]
+        },
+        "ref": {
+          "description": "Enough to find it again: a document section, a file path in a named repository, a schematic revision, or the instrument and date for a measurement. A citation you cannot re-check is not a citation.",
+          "type": "string",
+          "minLength": 3
+        },
+        "revision": { "type": "string" },
+        "retrieved": { "type": "string" },
+        "derives_from": {
+          "description": "The id of the source this one copies. Two documents that share an upstream are ONE source however many times they are cited - a vendor FAQ restating a datasheet corroborates nothing.",
+          "type": ["string", "null"]
+        },
+        "note": { "type": "string" }
+      }
+    },
+
+    "group": {
+      "type": "object",
+      "required": ["sources", "agreement"],
+      "properties": {
+        "sources": {
+          "description": "Source ids from the top-level sources list that were actually consulted FOR THIS GROUP. Citing a datasheet for the pin map does not corroborate the power section.",
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "agreement": {
+          "description": "full = every consulted source says the same thing. partial = they agree on most of it and the exceptions are listed in contradictions. conflicting = they do not agree and the profile records both readings.",
+          "enum": ["full", "partial", "conflicting"]
+        },
+        "checked": { "type": "string" },
+        "checked_by": { "type": "string" },
+        "note": { "type": "string" }
+      }
+    }
+  },
+
+  "type": "object",
+  "required": ["sources", "groups"],
+  "properties": {
+    "sources": {
+      "description": "Every source consulted for this profile, once each. May legitimately be empty on a fresh scaffold - the linter, not the schema, enforces how many are needed before a profile may leave draft.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/source" }
+    },
+
+    "groups": {
+      "description": "Per field-group corroboration. Board groups: gpio_map, strapping, adc, rtc_wake, power, mechanical, radio. Part groups: footprint, electrical, addressing.",
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/group" }
+    },
+
+    "conservative": {
+      "description": "This profile deliberately OVER-reserves: when unsure whether a pin is free it marks it consumed. That failure mode is safe - it refuses a pin that would have worked - so a conservative profile may go active on weaker corroboration. The reverse is never allowed: a profile may not bless pins as free on weak evidence.",
+      "type": "boolean",
+      "default": false
+    },
+
+    "conservative_rationale": {
+      "description": "Required when conservative is true. Say what the profile over-reserves and why that is the safe direction here.",
+      "type": "string",
+      "minLength": 20
+    },
+
+    "contradictions": {
+      "description": "Sources that disagree. Record BOTH readings. Never average them, never pick one silently, and never smooth a disagreement into a single confident number.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["field", "readings", "resolution"],
+        "properties": {
+          "field": { "type": "string" },
+          "readings": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "object",
+              "required": ["value", "source"],
+              "properties": {
+                "value": { "type": ["string", "number", "boolean", "null"] },
+                "source": { "type": "string" },
+                "note": { "type": "string" }
+              }
+            }
+          },
+          "resolution": {
+            "description": "unresolved = nobody has settled it, and the profile must not present either reading as fact. measured = an instrument settled it. chosen = one reading was adopted for a stated reason, which is weaker than measured and must say so.",
+            "enum": ["unresolved", "measured", "chosen"]
+          },
+          "resolved_value": { "type": ["string", "number", "boolean", "null"] },
+          "resolved_by": { "type": "string" },
+          "impact": {
+            "description": "What depends on this number. A contradiction with no impact is trivia; one that drives a battery decision is not.",
+            "type": "string"
+          },
+          "how_to_close": { "type": "string" }
+        }
+      }
+    },
+
+    "open_questions": {
+      "description": "Things nobody has looked up yet, as opposed to things sources disagree about.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["question", "impact"],
+        "properties": {
+          "question": { "type": "string" },
+          "impact": { "type": "string" },
+          "blocks_active": {
+            "description": "True when this question must be answered before the profile may leave draft.",
+            "type": "boolean",
+            "default": false
+          }
+        }
+      }
+    }
+  }
+}
