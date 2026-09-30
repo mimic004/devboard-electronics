@@ -1,9 +1,0 @@
-# Python 3.12, to match the paired electronics-design skill's venv.
-#
-# This skill is deliberately tiny on dependencies: it reads and writes JSON and
-# checks it against schemas. Nothing here talks to hardware - verify_profile.py
-# consumes the parent skill's board_cli.py / probe_client.py OUTPUT rather than
-# opening a port itself, so pyserial is not needed.
-
-jsonschema>=4.21,<5      # every gate is schema-first
-pytest>=8.0,<9           # tests/

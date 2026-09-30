@@ -1,0 +1,720 @@
+{
+  "schema": "hardware-electronics/component-manifest",
+  "version": "1.0",
+  "project": "pager-style-handheld",
+  "generated": "2026-09-27T09:00:00-06:00",
+  "generator": "devboard-electronics@0.1.0",
+  "units": {
+    "length": "mm",
+    "angle": "deg",
+    "current": "mA",
+    "voltage": "V",
+    "mass": "g",
+    "temp": "C"
+  },
+  "datum": {
+    "origin": "enclosure_interior_centre_of_split_plane",
+    "axes": "+X along the long axis toward the e-ink FPC; +Y across the width; +Z up out of the back shell",
+    "note": "The board is installed with the FPC toward +X, so USB-C is on the -X edge. Flipping the board requires flipping BOTH win_offset_x AND the USB side. Flipping only one doubles the error to 6.10 mm and clips the display, and nothing about the model looks wrong while it does it."
+  },
+  "assembly": {
+    "header_removed": true,
+    "header_removal_note": "The 2x20 female header is removed late, after the board has been powered and identified. A board that has never been powered on should not be modified."
+  },
+  "accepted_findings": {
+    "RF_UNVERIFIED": "The 2.4 GHz antenna connector is genuinely undetermined - the vendor spec table and the vendor FAQ disagree - and this revision deliberately designs NO second antenna port. The finding is accepted because the unknown is being routed around rather than built on. If a 2.4 GHz port is ever added, remove this acceptance first."
+  },
+  "envelope": {
+    "owner": "cad",
+    "interior": {
+      "l": 106.0,
+      "w": 72.0,
+      "h": 16.0
+    },
+    "exterior": {
+      "l": 110.0,
+      "w": 76.0,
+      "h": 20.0
+    },
+    "split_plane_z": 11.0,
+    "wall": 2.0,
+    "material": "PETG",
+    "material_filled": "none",
+    "rf_transparent": true
+  },
+  "components": [
+    {
+      "id": "mainboard",
+      "bom_ref": "mainboard",
+      "class": "pcb",
+      "drives_cad": true,
+      "footprint": {
+        "shape": "rect",
+        "l": 87.96,
+        "w": 36.63,
+        "h": 1.6,
+        "tolerance": 0.4,
+        "provenance": {
+          "l": "datasheet",
+          "w": "datasheet",
+          "h": "measured"
+        },
+        "verify_before": "print"
+      },
+      "placement": {
+        "owner": "cad",
+        "x": 0.0,
+        "y": 0.0,
+        "z": 13.5,
+        "rotation_z": 0.0,
+        "face": "front_interior",
+        "seated": "panel_down"
+      },
+      "orientation_constraint": {
+        "locked": true,
+        "kind": "feature_axis",
+        "feature": "eink_fpc",
+        "axis": "+X",
+        "reason": "The panel active area sits 3.05 mm off the module centre along the long axis, toward the end away from the FPC. The orientation is what sets the SIGN of win_offset_x, so rotating the board 180 degrees without also flipping the window offset clips the display.",
+        "drives": [
+          "win_offset_x",
+          "usb_side"
+        ]
+      },
+      "mounting": {
+        "method": "rib_frame",
+        "why_not_screws": "Heltec dimensions the mounting holes as SLOTS with no size given. A slot does not constrain position along its long axis, so locating posts through them are invalid - the board would be free to slide exactly as far as the display window cannot tolerate.",
+        "features": [
+          {
+            "kind": "rib_frame",
+            "thickness": 1.2,
+            "z_top": 13.5,
+            "z_bot": 11.0
+          },
+          {
+            "kind": "flex_clip",
+            "count": 6,
+            "wall": "+Y/-Y",
+            "ledge": 0.8
+          }
+        ]
+      },
+      "keepouts": [
+        {
+          "id": "header_zone",
+          "kind": "mechanical",
+          "shape": "rect",
+          "l": 51.36,
+          "w": 5.6,
+          "h": 9.0,
+          "ref": "underside",
+          "offset": {
+            "x": 0.0,
+            "y": -14.0
+          },
+          "conditional_on": "assembly.header_removed == false",
+          "reason": "The 2x20 header, if it is NOT removed. Removing it takes the board plus panel stack from 12.01 mm to about 2.8-3.0 mm, which is the whole reason a 20 mm body is possible instead of roughly 29 mm."
+        },
+        {
+          "id": "connector_edge",
+          "kind": "access",
+          "shape": "rect",
+          "l": 20.0,
+          "w": 36.63,
+          "h": 6.0,
+          "ref": "-X edge",
+          "offset": {
+            "x": -34.0,
+            "y": 0.0
+          },
+          "reason": "USB-C, the battery socket and the QuickLink sensor connector all exit on this edge and all need reach."
+        }
+      ],
+      "openings": [
+        {
+          "id": "display_window",
+          "kind": "window",
+          "shape": "rect",
+          "l": 69.1,
+          "w": 31.26,
+          "offset": {
+            "x": -3.05,
+            "y": 0.0
+          },
+          "tolerance": 0.4,
+          "bezel_overlap": 1.1,
+          "provenance": "measured:2026-09-19:printed-coupon",
+          "reason": "Active area 29.06 x 66.90 inside a 36.7 x 79.0 module: centred across the width, 3.05 mm off centre along the length. A symmetric 2.2 mm margin would have clipped 0.85 mm off the active area. The offset is a fact about the PANEL and belongs to electronics; the 1.10 mm bezel overlap is a choice about the PLASTIC and belongs to CAD."
+        },
+        {
+          "id": "usb_channel",
+          "kind": "channel",
+          "shape": "rect",
+          "l": 13.0,
+          "w": 6.26,
+          "depth": 11.22,
+          "ref": "-X wall",
+          "centreline_z": 13.9,
+          "accepts_plug_boot": {
+            "w": 12.6,
+            "h": 5.86
+          },
+          "spec_max_plug_boot": {
+            "w": 12.35,
+            "h": 6.5
+          },
+          "provenance": "measured",
+          "warning": "This channel is 0.64 mm short of the tallest legal USB-C plug boot. Measure your own cable's boot before printing.",
+          "reason": "The receptacle sits about 11 mm below the outer surface and a USB-C plug shell is only ~6.5 mm long, so the wall has to open a channel the whole plug travels down. Without it the port is physically unreachable and flashing becomes OTA-only."
+        }
+      ],
+      "rf": [
+        {
+          "id": "lora_ufl",
+          "band_mhz": [
+            902,
+            928
+          ],
+          "connector": "U.FL",
+          "status": "confirmed",
+          "keepout": {
+            "shape": "rect",
+            "l": 52.0,
+            "w": 10.0,
+            "h": 6.0,
+            "offset": {
+              "x": 0.0,
+              "y": -28.0
+            }
+          },
+          "material_rule": "no carbon-, glass- or metal-filled filament within the keepout",
+          "clearance_from": [
+            "battery",
+            "speaker.magnet_rf",
+            "motor"
+          ],
+          "min_clearance_mm": 5.0,
+          "note": "Reserve the antenna channel now, even though LoRa is a stretch goal. Retrofitting an antenna path into a finished shell is painful, and the band is locked at order time anyway."
+        },
+        {
+          "id": "wifi_24",
+          "band_mhz": [
+            2400,
+            2500
+          ],
+          "connector": "unconfirmed",
+          "status": "UNVERIFIED",
+          "note": "The vendor spec table says U.FL; the vendor's own FAQ says a spring antenna with no connector. Do not design a second antenna port without physically inspecting the board."
+        }
+      ],
+      "thermal": {
+        "dissipation_mw": 400,
+        "max_ambient_c": 60,
+        "needs_airflow": false
+      },
+      "electrical": {
+        "rail": "VBAT",
+        "v_min": 3.0,
+        "v_max": 4.3,
+        "i_avg_ma": 1.09,
+        "i_peak_ma": 220
+      },
+      "cad_parameters": {
+        "board_l": "footprint.l",
+        "board_w": "footprint.w",
+        "board_t": "footprint.h",
+        "win_l": "openings.display_window.l",
+        "win_w": "openings.display_window.w",
+        "win_offset_x": "openings.display_window.offset.x",
+        "usb_ch_w": "openings.usb_channel.w",
+        "usb_recept_h": "openings.usb_channel.centreline_z"
+      }
+    },
+    {
+      "id": "battery",
+      "bom_ref": "battery",
+      "class": "battery",
+      "drives_cad": true,
+      "footprint": {
+        "shape": "rect",
+        "l": 50.0,
+        "w": 29.0,
+        "h": 7.0,
+        "tolerance": 0.5,
+        "provenance": {
+          "l": "measured",
+          "w": "measured",
+          "h": "measured"
+        },
+        "verify_before": "none"
+      },
+      "placement": {
+        "owner": "cad",
+        "x": -20.0,
+        "y": 18.0,
+        "z": 0.0,
+        "rotation_z": 0.0,
+        "face": "back_interior"
+      },
+      "mounting": {
+        "method": "shallow_bay_with_foam",
+        "features": [
+          {
+            "kind": "bay",
+            "wall": 1.2,
+            "depth": 7.6
+          }
+        ]
+      },
+      "keepouts": [
+        {
+          "id": "swell_allowance",
+          "kind": "mechanical",
+          "shape": "rect",
+          "l": 51.0,
+          "w": 30.0,
+          "h": 8.5,
+          "reason": "Pouch cells grow with age. A bay sized exactly to a new cell becomes a press fit on an old one, and pressure on a pouch cell is the failure you do not want."
+        }
+      ],
+      "electrical": {
+        "rail": "VBAT",
+        "capacity_mah": 1100,
+        "v_min": 3.0,
+        "v_max": 4.2
+      },
+      "cad_parameters": {
+        "batt_l": "footprint.l",
+        "batt_w": "footprint.w",
+        "batt_t": "footprint.h"
+      }
+    },
+    {
+      "id": "speaker",
+      "bom_ref": "speaker",
+      "class": "transducer",
+      "drives_cad": true,
+      "footprint": {
+        "shape": "circle",
+        "d": 20.0,
+        "h": 4.0,
+        "tolerance": 0.3,
+        "provenance": {
+          "d": "measured",
+          "h": "measured"
+        },
+        "verify_before": "none",
+        "fit_coupon_required": true
+      },
+      "placement": {
+        "owner": "cad",
+        "x": 33.0,
+        "y": -8.0,
+        "z": 0.0,
+        "rotation_z": 0.0,
+        "face": "back_interior"
+      },
+      "orientation_constraint": {
+        "locked": true,
+        "kind": "radiating_axis",
+        "axis": "-Z",
+        "reason": "The cone must face the grille in the back shell. Mounted the other way round it radiates into the battery and the case sounds dead."
+      },
+      "mounting": {
+        "method": "concentric_rings",
+        "why_not_chamber": "The speaker's rear volume IS the sealed case interior. Building it a separate chamber would shrink that volume and cost low end.",
+        "features": [
+          {
+            "kind": "ring",
+            "bore": 20.6,
+            "wall": 1.2,
+            "h": 3.0
+          }
+        ]
+      },
+      "keepouts": [
+        {
+          "id": "air_gap",
+          "kind": "acoustic",
+          "shape": "cylinder",
+          "d": 21.0,
+          "h": 0.8,
+          "ref": "front_face",
+          "min": 0.3,
+          "max": 0.8,
+          "reason": "A large front cavity in front of the cone sounds honky. Keep the gap between the cone and the grille inner face small and bounded at BOTH ends."
+        },
+        {
+          "id": "magnet_rf",
+          "kind": "magnetic",
+          "shape": "cylinder",
+          "d": 24.0,
+          "h": 6.0,
+          "reason": "Keep the LoRa antenna channel clear of the speaker magnet."
+        },
+        {
+          "id": "wire_exit",
+          "kind": "cable",
+          "shape": "rect",
+          "l": 6.0,
+          "w": 2.0,
+          "h": 4.0,
+          "ref": "+X",
+          "offset": {
+            "x": 12.0,
+            "y": 0.0
+          },
+          "reason": "The speaker pigtail has to leave somewhere, and it must not be pinched by the mounting ring."
+        }
+      ],
+      "openings": [
+        {
+          "id": "grille",
+          "kind": "perforation",
+          "pattern": "hex",
+          "min_open_area_mm2": 267,
+          "target_ratio_of_cone": 0.85,
+          "min_web": 0.8,
+          "face": "back_exterior",
+          "must_not_breach": [
+            "front_cavity_seal"
+          ],
+          "reason": "Grille open area should be at least the speaker's radiating area; below that expect top-end roll-off. Electronics owns the open-AREA requirement; CAD owns the hole pattern that delivers it."
+        }
+      ],
+      "electrical": {
+        "rail": "VBAT_via_amp",
+        "i_peak_ma": 700,
+        "impedance_ohm": 8,
+        "power_w": 1.0
+      },
+      "cad_parameters": {
+        "spk_d": "footprint.d",
+        "spk_t": "footprint.h"
+      },
+      "substitution_trap": "The obvious 'mini metal speaker' substitute is 28 mm, not 20 mm, and will not fit the pocket. Check the Drives CAD column before substituting."
+    },
+    {
+      "id": "expander",
+      "bom_ref": "expander",
+      "class": "module",
+      "drives_cad": true,
+      "footprint": {
+        "shape": "rect",
+        "l": 38.0,
+        "w": 23.0,
+        "h": 13.0,
+        "tolerance": 0.4,
+        "provenance": {
+          "l": "measured",
+          "w": "measured",
+          "h": "measured"
+        },
+        "verify_before": "none"
+      },
+      "placement": {
+        "owner": "cad",
+        "x": 25.0,
+        "y": 22.0,
+        "z": 0.0,
+        "rotation_z": 0.0,
+        "face": "back_interior"
+      },
+      "mounting": {
+        "method": "screw_bosses",
+        "features": [
+          {
+            "kind": "boss",
+            "count": 4,
+            "d": 4.0,
+            "bore": 2.0
+          }
+        ]
+      },
+      "keepouts": [
+        {
+          "id": "terminal_edge",
+          "kind": "access",
+          "shape": "rect",
+          "l": 38.0,
+          "w": 6.0,
+          "h": 13.0,
+          "offset": {
+            "x": 0.0,
+            "y": 8.5
+          },
+          "reason": "Wire entry for the keypad harness. A boss placed here makes the module unwireable after assembly."
+        }
+      ],
+      "electrical": {
+        "rail": "3V3",
+        "i_avg_ma": 1.0,
+        "i_peak_ma": 2.0
+      },
+      "cad_parameters": {
+        "exp_l": "footprint.l",
+        "exp_w": "footprint.w",
+        "exp_h": "footprint.h"
+      },
+      "substitution_trap": "This module exists only because the board has no free ADC1 channel, which killed the resistor-ladder keypad. It is 38 x 23 mm, and adopting it is what pushed the body from 105 x 72 to 110 x 76 mm. One pin decision moved the enclosure on two axes."
+    },
+    {
+      "id": "motor",
+      "bom_ref": "motor",
+      "class": "motor",
+      "drives_cad": true,
+      "footprint": {
+        "shape": "circle",
+        "d": 10.0,
+        "h": 3.0,
+        "tolerance": 0.2,
+        "provenance": {
+          "d": "measured",
+          "h": "measured"
+        },
+        "verify_before": "none"
+      },
+      "placement": {
+        "owner": "cad",
+        "x": -15.0,
+        "y": -8.0,
+        "z": 0.0,
+        "rotation_z": 0.0,
+        "face": "back_interior"
+      },
+      "orientation_constraint": {
+        "locked": true,
+        "kind": "thermal_axis",
+        "axis": "-Z",
+        "reason": "A coin ERM motor spins an eccentric mass in the plane of its body. Mounted on edge it fights the case wall instead of shaking it, and the buzz you feel drops sharply."
+      },
+      "mounting": {
+        "method": "adhesive_pad",
+        "features": [
+          {
+            "kind": "pocket",
+            "d": 10.4,
+            "depth": 3.2
+          }
+        ]
+      },
+      "electrical": {
+        "rail": "3V3_via_haptic",
+        "i_avg_ma": 0.0,
+        "i_peak_ma": 156
+      },
+      "cad_parameters": {
+        "motor_d": "footprint.d",
+        "motor_t": "footprint.h"
+      }
+    },
+    {
+      "id": "piezo",
+      "bom_ref": "piezo",
+      "class": "transducer",
+      "drives_cad": true,
+      "footprint": {
+        "shape": "circle",
+        "d": 15.0,
+        "h": 2.5,
+        "tolerance": 0.2,
+        "provenance": {
+          "d": "measured",
+          "h": "measured"
+        },
+        "verify_before": "none"
+      },
+      "placement": {
+        "owner": "cad",
+        "x": -40.0,
+        "y": -15.0,
+        "z": 0.0,
+        "rotation_z": 0.0,
+        "face": "back_interior"
+      },
+      "orientation_constraint": {
+        "locked": true,
+        "kind": "radiating_axis",
+        "axis": "-Z",
+        "reason": "A piezo disc radiates along its normal and needs its rim clamped and its centre free. Clamping the centre kills it."
+      },
+      "mounting": {
+        "method": "rim_clamp",
+        "features": [
+          {
+            "kind": "ring",
+            "bore": 15.4,
+            "wall": 1.0,
+            "h": 1.5
+          }
+        ]
+      },
+      "electrical": {
+        "rail": "3V3",
+        "i_peak_ma": 12
+      },
+      "cad_parameters": {
+        "piezo_d": "footprint.d",
+        "piezo_t": "footprint.h"
+      },
+      "substitution_trap": "This started at 20-27 mm in the BOM. A CAD-side search over the real back-shell footprints found the largest free disc anywhere was 15.6 mm once the battery, speaker and expander had taken their space, so the BOM changed to 15 mm. The dependency runs both ways."
+    }
+  ],
+  "cable_runs": [
+    {
+      "id": "batt_to_jp1",
+      "from": "battery.lead",
+      "to": "mainboard.JP1",
+      "connector": {
+        "type": "SH1.25",
+        "pitch_mm": 1.25,
+        "pins": 2,
+        "polarity_verified": true,
+        "warning": "Polarity is not standardised. This one was metered before the first connection."
+      },
+      "conductors": 2,
+      "awg": 28,
+      "bundle_d_mm": 2.4,
+      "min_bend_r_mm": 6.0,
+      "slack_mm": 8,
+      "channel_min": {
+        "w": 4.0,
+        "h": 3.0
+      },
+      "path_hint": [
+        "batt_bay_+X",
+        "under_module_deck"
+      ],
+      "must_avoid": [
+        "usb_channel",
+        "antenna_channel"
+      ]
+    },
+    {
+      "id": "spk_to_amp",
+      "from": "speaker.pads",
+      "to": "amp.OUT",
+      "conductors": 2,
+      "awg": 30,
+      "bundle_d_mm": 1.8,
+      "min_bend_r_mm": 4.0,
+      "slack_mm": 6,
+      "channel_min": {
+        "w": 6.0,
+        "h": 2.0
+      },
+      "note": "Widened from 4.0 to 6.0 mm after the original slot fouled a grille web."
+    }
+  ],
+  "assertions": [
+    {
+      "id": "spk-air-gap",
+      "subject": "speaker",
+      "check": "clearance",
+      "target": "grille_inner_face",
+      "min_mm": 0.3,
+      "max_mm": 0.8,
+      "owner": "cad",
+      "blocking": true,
+      "why": "Acoustic. Bounded at both ends: too tight chokes the cone, too loose sounds honky."
+    },
+    {
+      "id": "antenna-clear",
+      "subject": "lora_ufl",
+      "check": "no_intersect",
+      "target": [
+        "battery",
+        "speaker.magnet_rf",
+        "motor"
+      ],
+      "owner": "cad",
+      "blocking": true,
+      "why": "Batteries, magnets and motors all detune and shadow an antenna."
+    },
+    {
+      "id": "batt-clear-of-usb",
+      "subject": "battery",
+      "check": "no_intersect_in_plan",
+      "target": "usb_channel",
+      "owner": "cad",
+      "blocking": true,
+      "why": "The bay used to sit in the channel's plan footprint, and a 7 mm cell squeezed the channel to 4.14 mm so no ordinary cable would go in. The failure mode is QUIET: the model simply shrinks the channel to suit the cell rather than telling you the cable will not fit."
+    },
+    {
+      "id": "wall-min",
+      "subject": "enclosure",
+      "check": "min_wall",
+      "min_mm": 1.2,
+      "owner": "cad",
+      "blocking": true,
+      "why": "Below this the shell flexes enough to unseat the flex clips."
+    },
+    {
+      "id": "no-filled-filament",
+      "subject": "enclosure",
+      "check": "material_not_in",
+      "values": [
+        "carbon_filled",
+        "glass_filled",
+        "metal_filled"
+      ],
+      "owner": "cad",
+      "blocking": true,
+      "why": "Lossy at 2.4 GHz. Plain PLA or PETG is transparent enough that it makes no measurable difference. Electronics owns this constraint as a VETO even though CAD owns the material choice."
+    }
+  ],
+  "assembly_order": [
+    {
+      "step": 1,
+      "what": "Power and identify the bare board over USB; back up the factory flash.",
+      "why_this_order": "A board that has never been powered on should not be modified, and factory firmware cannot be recovered after it is overwritten.",
+      "irreversible": false
+    },
+    {
+      "step": 2,
+      "what": "Print and check the fit coupons for the speaker ring and the USB channel.",
+      "why_this_order": "Ten minutes here saves a ten-hour mistake. Both features are press fits against parts whose dimensions were not originally measured.",
+      "irreversible": false
+    },
+    {
+      "step": 3,
+      "what": "Remove the 2x20 header: cut the plastic body away, snip the stubs, then desolder pins one at a time.",
+      "why_this_order": "Do this late, not early. Bulk-desoldering 40 through-hole pins at once lifts pads, and the board must be known good first.",
+      "irreversible": true
+    },
+    {
+      "step": 4,
+      "what": "Kapton-tape the pin stubs before the cell goes anywhere near them.",
+      "why_this_order": "A pouch cell against sharp pin stubs is a puncture risk.",
+      "irreversible": false
+    },
+    {
+      "step": 5,
+      "what": "Meter the battery lead polarity, then fit the cell and close the back shell.",
+      "why_this_order": "Last, because everything above needs the bay empty.",
+      "irreversible": false
+    }
+  ],
+  "open_gates": [
+    {
+      "key": "mainboard.sleep_current_ua",
+      "assumed": 18,
+      "unit": "uA",
+      "provenance": "vendor_claim",
+      "conflict": "The datasheet text says 20 uA; the datasheet table and the product page say 18 uA. No independent measurement exists.",
+      "impact": "Sets the long tail of the runtime estimate.",
+      "verify_before_build": true,
+      "how_to_close": "Meter in series with the battery positive lead, on the uA range, with USB DISCONNECTED."
+    },
+    {
+      "key": "mainboard.charge.prog_resistor_ohm",
+      "assumed": 2000,
+      "unit": "ohm",
+      "provenance": "schematic",
+      "impact": "Sets the charge current, which sets the minimum safe cell capacity. This is a battery-safety number.",
+      "verify_before_build": true,
+      "how_to_close": "Meter R18 on the physical board with the board unpowered, and confirm the charge-current constant against the charge IC's own datasheet. Schematic is not silicon."
+    }
+  ],
+  "content_hash": "sha256:ba97059426065df73e9e4cb819be81bf147dc95e8f7e8bd200de47abd002592a"
+}

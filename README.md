@@ -1,18 +1,18 @@
-# Hardware skills: electronics design, and the data it rests on
+# devboard-electronics
 
-Two paired agent skills for hobbyist electronics built from modules and dev
-boards, designed to complement
-**[flowful-ai/cad-skill](https://github.com/flowful-ai/cad-skill)** — Nicolas
-Chourrout's parametric CAD skill, which turns a described object into a
-CadQuery script, an STL and a preview.
+Two paired agent skills for hobbyist electronics built from **dev boards and
+breakout modules joined by wire** — not PCB design. Built to complement
+**[flowful-ai/cad-skill](https://github.com/flowful-ai/cad-skill)**, Nicolas
+Chourrout's parametric CAD skill, which turns a described object into a CadQuery
+script, an STL and a preview.
 
 That skill builds the **plastic**. These build the **electronics that has to fit
 inside it**, and the contract between the two.
 
 | Skill | Answers |
 |---|---|
-| [`electronics-design/`](electronics-design/) | Will this design work? Pin maps, power budgets, BOMs, bring-up, and a hash-locked handoff to CAD |
-| [`board-profiles/`](board-profiles/) | Why should we believe the board data it was checked against? |
+| [`devboard-electronics/`](devboard-electronics/) | Will this design work? Pin maps, power budgets, BOMs, bring-up, and a hash-locked handoff to CAD |
+| [`devboard-profiles/`](devboard-profiles/) | Why should we believe the board data it was checked against? |
 
 ## Why these exist
 
@@ -45,7 +45,7 @@ Two real failures set the bar:
 ## How they fit with `cad-skill`
 
 Peers, not parent and child. A request naming both — *"a printed case for my
-ESP32 weather station"* — starts in `electronics-design`, which produces a
+ESP32 weather station"* — starts in `devboard-electronics`, which produces a
 `component-manifest.json`, and then hands that to the CAD skill.
 
 **Electronics owns what is true about the part; CAD owns what is true about the
@@ -82,7 +82,7 @@ editing a dimension must.
 ### `cad_bridge/` — the CAD side, without forking the CAD skill
 
 `cad-skill` is licensed separately (PolyForm Noncommercial), so **it is not
-modified**. [`electronics-design/cad_bridge/`](electronics-design/cad_bridge/)
+modified**. [`devboard-electronics/cad_bridge/`](devboard-electronics/cad_bridge/)
 holds the integration instead:
 
 - `consume_manifest.py` — flattens a manifest into parameters a CadQuery script
@@ -97,27 +97,32 @@ successful build as a failure with an empty file list. `run_cad_model.py` judges
 a run by a stdout sentinel and by freshly written artefacts instead.
 
 Integration is a project instruction, not a fork. See
-[`cad_bridge/README.md`](electronics-design/cad_bridge/README.md).
+[`cad_bridge/README.md`](devboard-electronics/cad_bridge/README.md).
 
 ## Install
 
 These are Claude Code / Copilot-style agent skills: a directory containing a
-`SKILL.md` with YAML frontmatter.
+`SKILL.md` with YAML frontmatter. This repository holds **two** of them, so
+clone it and copy both directories into your skills folder.
 
 ```bash
 # Claude Code
-git clone https://github.com/<you>/hardware-skills /tmp/hardware-skills
-cp -r /tmp/hardware-skills/electronics-design ~/.claude/skills/
-cp -r /tmp/hardware-skills/board-profiles    ~/.claude/skills/
+git clone https://github.com/mimic004/devboard-electronics /tmp/devboard
+cp -r /tmp/devboard/devboard-electronics ~/.claude/skills/
+cp -r /tmp/devboard/devboard-profiles    ~/.claude/skills/
 ```
 
 ```powershell
 # GitHub Copilot app (Windows)
 $dst = "$env:APPDATA\com.github.githubapp\app-skills"
-git clone https://github.com/<you>/hardware-skills $env:TEMP\hardware-skills
-Copy-Item "$env:TEMP\hardware-skills\electronics-design" $dst -Recurse
-Copy-Item "$env:TEMP\hardware-skills\board-profiles"    $dst -Recurse
+git clone https://github.com/mimic004/devboard-electronics $env:TEMP\devboard
+Copy-Item "$env:TEMP\devboard\devboard-electronics" $dst -Recurse
+Copy-Item "$env:TEMP\devboard\devboard-profiles"    $dst -Recurse
 ```
+
+Install them **side by side**: `devboard-profiles` locates its peer by looking
+for a sibling directory, so it can lint and audit the profiles the other skill
+ships with.
 
 Then, in each skill directory:
 
@@ -132,7 +137,7 @@ create a venv `cad-skill` cannot share.
 
 ## What you get
 
-`electronics-design` runs nine gated phases. Each gate is a command with an
+`devboard-electronics` runs nine gated phases. Each gate is a command with an
 exit code; the agent derives its next action from a stable finding `code`, never
 from prose.
 
@@ -184,8 +189,8 @@ practice is cited as such and can be checked normally.
 ## Tests
 
 ```bash
-cd electronics-design && python -m pytest tests -q   # 141 tests
-cd board-profiles    && python -m pytest tests -q   #  51 tests
+cd devboard-electronics && python -m pytest tests -q   # 141 tests
+cd devboard-profiles    && python -m pytest tests -q   #  51 tests
 ```
 
 No hardware, no network. Serial sessions and `esptool` output are replayed from
